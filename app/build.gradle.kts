@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.hoker.intra_example"
+    namespace = "com.carbidecowboy.intra_example"
     compileSdk = 34
 
     defaultConfig {

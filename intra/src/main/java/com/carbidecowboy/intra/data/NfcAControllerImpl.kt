@@ -1,13 +1,13 @@
-package com.hoker.intra.data
+package com.carbidecowboy.intra.data
 
 import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcA
 import android.util.Log
-import com.hoker.intra.domain.ApduUtils
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
+import com.carbidecowboy.intra.domain.ApduUtils
+import com.carbidecowboy.intra.domain.NfcController
+import com.carbidecowboy.intra.domain.OperationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

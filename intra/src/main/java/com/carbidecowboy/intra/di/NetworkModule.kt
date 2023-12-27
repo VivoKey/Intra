@@ -1,6 +1,6 @@
-package com.hoker.intra.di
+package com.carbidecowboy.intra.di
 
-import com.hoker.intra.domain.AuthApiService
+import com.carbidecowboy.intra.domain.AuthApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

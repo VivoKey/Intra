@@ -1,9 +1,9 @@
-package com.hoker.intra.domain
+package com.carbidecowboy.intra.domain
 
-import com.hoker.intra.domain.request.ChallengeRequest
-import com.hoker.intra.domain.request.SessionRequest
-import com.hoker.intra.domain.response.ChallengeResponse
-import com.hoker.intra.domain.response.SessionResponse
+import com.carbidecowboy.intra.domain.request.ChallengeRequest
+import com.carbidecowboy.intra.domain.request.SessionRequest
+import com.carbidecowboy.intra.domain.response.ChallengeResponse
+import com.carbidecowboy.intra.domain.response.SessionResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

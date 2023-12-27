@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.carbidecowboy.intra.domain
 
 sealed class OperationResult<out T> {
     data class Success<out T>(val data: T) : OperationResult<T>()

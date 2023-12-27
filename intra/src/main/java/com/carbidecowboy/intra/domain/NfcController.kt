@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.carbidecowboy.intra.domain
 
 import android.nfc.NdefMessage
 import android.nfc.Tag

@@ -1,4 +1,4 @@
-package com.hoker.intra.domain.request
+package com.carbidecowboy.intra.domain.request
 
 data class SessionRequest(
     val uid: String,

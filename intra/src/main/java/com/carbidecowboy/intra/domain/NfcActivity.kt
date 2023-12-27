@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.carbidecowboy.intra.domain
 
 import androidx.activity.ComponentActivity
 import dagger.hilt.android.AndroidEntryPoint

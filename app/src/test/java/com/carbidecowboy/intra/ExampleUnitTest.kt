@@ -1,4 +1,4 @@
-package com.hoker.intra
+package com.carbidecowboy.intra
 
 import org.junit.Test
 

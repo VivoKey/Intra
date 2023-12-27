@@ -1,15 +1,15 @@
-package com.hoker.intra.data
+package com.carbidecowboy.intra.data
 
 import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcV
-import com.hoker.intra.domain.ApduUtils
-import com.hoker.intra.domain.AuthApiService
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
-import com.hoker.intra.domain.request.ChallengeRequest
-import com.hoker.intra.domain.request.SessionRequest
+import com.carbidecowboy.intra.domain.ApduUtils
+import com.carbidecowboy.intra.domain.AuthApiService
+import com.carbidecowboy.intra.domain.NfcController
+import com.carbidecowboy.intra.domain.OperationResult
+import com.carbidecowboy.intra.domain.request.ChallengeRequest
+import com.carbidecowboy.intra.domain.request.SessionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow

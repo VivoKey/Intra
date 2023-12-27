@@ -1,15 +1,15 @@
-package com.hoker.intra.di
+package com.carbidecowboy.intra.di
 
 import android.content.Context
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.nfc.tech.NfcV
-import com.hoker.intra.data.IsodepControllerImpl
-import com.hoker.intra.data.NfcVControllerImpl
-import com.hoker.intra.domain.NfcAdapterController
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
+import com.carbidecowboy.intra.data.IsodepControllerImpl
+import com.carbidecowboy.intra.data.NfcVControllerImpl
+import com.carbidecowboy.intra.domain.NfcAdapterController
+import com.carbidecowboy.intra.domain.NfcController
+import com.carbidecowboy.intra.domain.OperationResult
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

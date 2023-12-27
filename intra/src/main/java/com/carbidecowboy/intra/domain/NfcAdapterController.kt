@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.carbidecowboy.intra.domain
 
 import android.app.Activity
 import android.nfc.NfcAdapter

@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
+    id("maven-publish")
 }
 
 android {
@@ -51,4 +52,17 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("commons-codec:commons-codec:1.13")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.CarbideCowboy"
+                artifactId = "Intra"
+                version = "1.0.0"
+            }
+        }
+    }
 }

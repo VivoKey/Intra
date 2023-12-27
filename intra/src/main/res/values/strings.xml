@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">lib-nfc</string>
+    <string name="device_not_supported">Sorry, this application will not work on your device as it requires NFC.</string>
+</resources>

@@ -23,7 +23,6 @@ object Consts {
     const val U2F_RESPONSE = "5532465F56329000"
     const val FIDO2_URL = "https://getcybernetic.com/fido"
     const val TESLA_URL = "https://getcybernetic.com/tesla"
-    const val ACCELEROMETER_ENABLED_KEY = "accelerometerKey"
 
     //OTP
     const val SELECT_OTP = "00A404000DA0000005272101014150455801"

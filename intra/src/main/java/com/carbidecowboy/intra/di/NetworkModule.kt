@@ -8,7 +8,20 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IntraOkHttp
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IntraAuthRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IntraAuthApiService
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -20,6 +33,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @IntraOkHttp
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -34,7 +48,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @IntraAuthRetrofit
+    fun provideAuthRetrofit(@IntraOkHttp okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(AUTH_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -44,7 +59,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
+    @IntraAuthApiService
+    fun provideAuthApiService(@IntraAuthRetrofit retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
     }
 }

@@ -4,6 +4,7 @@ import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcV
+import com.carbidecowboy.intra.di.IntraAuthApiService
 import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.AuthApiService
 import com.carbidecowboy.intra.domain.NfcController
@@ -21,7 +22,7 @@ import java.nio.ByteBuffer
 import javax.inject.Inject
 
 class NfcVControllerImpl @Inject constructor(
-    private val authApiService: AuthApiService
+    @IntraAuthApiService private val authApiService: AuthApiService
 ): NfcController {
 
     companion object {

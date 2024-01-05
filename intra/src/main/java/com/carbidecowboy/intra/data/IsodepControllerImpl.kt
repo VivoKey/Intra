@@ -5,6 +5,7 @@ import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.nfc.tech.Ndef
 import android.util.Log
+import com.carbidecowboy.intra.di.IntraAuthApiService
 import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.AuthApiService
 import com.carbidecowboy.intra.domain.NfcController
@@ -23,7 +24,7 @@ import javax.inject.Inject
 import kotlin.experimental.xor
 
 class IsodepControllerImpl @Inject constructor(
-    private val authApiService: AuthApiService
+    @IntraAuthApiService private val authApiService: AuthApiService
 ) : NfcController {
 
     private val _connectionStatus = MutableStateFlow(false)

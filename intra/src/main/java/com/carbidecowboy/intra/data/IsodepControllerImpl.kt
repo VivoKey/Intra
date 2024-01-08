@@ -186,7 +186,8 @@ class IsodepControllerImpl @Inject constructor(
                 OperationResult.Success(sessionResponse!!.token)
             }
         } catch (e: Exception) {
-            OperationResult.Failure()
+            Log.i("getVivokeyJwt", e.message.toString())
+            OperationResult.Failure(e)
         }
     }
 

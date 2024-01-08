@@ -164,6 +164,7 @@ class IsodepControllerImpl @Inject constructor(
                 pcdChallengeBytes.copyInto(command, 5, 0)
                 command[37] = 0x00.toByte()
 
+                Log.i("Part 2 Command", Hex.encodeHexString(command))
                 val response = isoDep.transceive(command)
                 isoDep.close()
 

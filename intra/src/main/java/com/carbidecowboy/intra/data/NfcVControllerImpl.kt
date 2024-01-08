@@ -4,6 +4,7 @@ import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NfcV
+import android.util.Log
 import com.carbidecowboy.intra.di.IntraAuthApiService
 import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.AuthApiService
@@ -183,6 +184,7 @@ class NfcVControllerImpl @Inject constructor(
             // copy the challenge
             challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
             // connect and send command
+            Log.i("Command", Hex.encodeHexString(command))
             val response = nfcV.transceive(command)
             nfcV.close()
 

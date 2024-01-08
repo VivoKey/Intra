@@ -176,14 +176,20 @@ class IsodepControllerImpl @Inject constructor(
                 )
 
                 val sessionResponse = async {
-                    authApiService.postSession(sessionRequest).body()
+                    authApiService.postSession(sessionRequest)
                 }.await()
 
-                if (sessionResponse == null) {
+                if (!sessionResponse.isSuccessful) {
                     OperationResult.Failure()
                 }
 
-                OperationResult.Success(sessionResponse!!.token)
+                val result = sessionResponse.body()
+                result?.token?.let { jwt ->
+                    Log.i("JWT:", jwt)
+                    return@withContext OperationResult.Success(jwt)
+                }
+
+                OperationResult.Failure()
             }
         } catch (e: Exception) {
             Log.i("getVivokeyJwt", e.message.toString())

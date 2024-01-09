@@ -167,6 +167,7 @@ class IsodepControllerImpl @Inject constructor(
                 Log.i("Part 2 Command", Hex.encodeHexString(command))
                 val response = isoDep.transceive(command)
                 isoDep.close()
+                Log.i("Response", Hex.encodeHexString(response))
 
                 val responseString = Hex.encodeHexString(response)
 

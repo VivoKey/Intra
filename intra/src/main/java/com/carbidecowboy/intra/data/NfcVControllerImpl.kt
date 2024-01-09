@@ -187,6 +187,7 @@ class NfcVControllerImpl @Inject constructor(
             Log.i("Command", Hex.encodeHexString(command))
             val response = nfcV.transceive(command)
             nfcV.close()
+            Log.i("Response", Hex.encodeHexString(response))
 
             val sessionRequest = SessionRequest(
                 uid = Hex.encodeHexString(tag.id!!.reversedArray()),

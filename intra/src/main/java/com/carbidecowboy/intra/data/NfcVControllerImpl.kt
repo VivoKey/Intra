@@ -179,8 +179,8 @@ class NfcVControllerImpl @Inject constructor(
             command[UID_BYTE_LENGTH + 2] = 0x00
             // RFU
             command[UID_BYTE_LENGTH + 3] = 0x00
-            // Key slot as byte (only supporting slot 1 for now)
-            command[UID_BYTE_LENGTH + 4] = 0x01
+            // Key slot as byte (only supporting slot 2 for now)
+            command[UID_BYTE_LENGTH + 4] = 0x02
             // copy the challenge
             challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
             // connect and send command

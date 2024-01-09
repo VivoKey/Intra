@@ -122,7 +122,7 @@ class IsodepControllerImpl @Inject constructor(
                 command[2] = 0x00.toByte()
                 command[3] = 0x00.toByte()
                 command[4] = 0x02.toByte()
-                command[5] = 0x01.toByte()
+                command[5] = 0x02.toByte()
                 command[6] = 0x00.toByte()
                 command[7] = 0x00.toByte()
 

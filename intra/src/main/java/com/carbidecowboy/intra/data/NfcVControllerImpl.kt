@@ -150,66 +150,73 @@ class NfcVControllerImpl @Inject constructor(
     }
 
     override suspend fun getVivokeyJwt(tag: Tag): OperationResult<String> {
-        return withContext(Dispatchers.IO) {
+        return try {
 
-            //get challenge from
-            val challengeRequest = ChallengeRequest(1)
-            val challengeResponse = async {
-                authApiService.postChallenge(challengeRequest).body()
-            }.await()
+            withContext(Dispatchers.IO) {
 
-            if (challengeResponse == null) {
+                //get challenge from
+                val challengeRequest = ChallengeRequest(1)
+                val challengeResponse = async {
+                    authApiService.postChallenge(challengeRequest).body()
+                }.await()
+
+                if (challengeResponse == null) {
+                    OperationResult.Failure()
+                }
+
+                val nfcV = NfcV.get(tag)
+                nfcV.connect()
+
+                // truncate challenge to 10 bytes
+                // challenge string into hex
+                val challengeBytes: ByteArray =
+                    Hex.decodeHex(challengeResponse!!.payload.substring(0, 20))
+                val command = ByteArray(15 + UID_BYTE_LENGTH)
+                // Spark 1 flag mode (addressed command)
+                command[0] = 0x20
+                // authentication command code
+                command[1] = 0x35
+                // copy into command byte array
+                tag.id.copyInto(command, 2, 0)
+                // CSI (AES = 0x00)
+                command[UID_BYTE_LENGTH + 2] = 0x00
+                // RFU
+                command[UID_BYTE_LENGTH + 3] = 0x00
+                // Key slot as byte (only supporting slot 2 for now)
+                command[UID_BYTE_LENGTH + 4] = 0x02
+                // copy the challenge
+                challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
+                // connect and send command
+                Log.i("Command", Hex.encodeHexString(command))
+                val response = nfcV.transceive(command)
+                nfcV.close()
+                Log.i("Response", Hex.encodeHexString(response))
+
+                val sessionRequest = SessionRequest(
+                    uid = Hex.encodeHexString(tag.id!!.reversedArray()),
+                    response = Hex.encodeHexString(response),
+                    token = challengeResponse.token
+                )
+
+                val sessionResponse = async {
+                    authApiService.postSession(sessionRequest)
+                }.await()
+
+                if (!sessionResponse.isSuccessful) {
+                    OperationResult.Failure()
+                }
+
+                val result = sessionResponse.body()
+                result?.token?.let { jwt ->
+                    println(jwt)
+                    return@withContext OperationResult.Success(jwt)
+                }
+
                 OperationResult.Failure()
             }
-
-            val nfcV = NfcV.get(tag)
-            nfcV.connect()
-
-            // truncate challenge to 10 bytes
-            // challenge string into hex
-            val challengeBytes: ByteArray = Hex.decodeHex(challengeResponse!!.payload.substring(0, 20))
-            val command = ByteArray(15 + UID_BYTE_LENGTH)
-            // Spark 1 flag mode (addressed command)
-            command[0] = 0x20
-            // authentication command code
-            command[1] = 0x35
-            // copy into command byte array
-            tag.id.copyInto(command, 2, 0)
-            // CSI (AES = 0x00)
-            command[UID_BYTE_LENGTH + 2] = 0x00
-            // RFU
-            command[UID_BYTE_LENGTH + 3] = 0x00
-            // Key slot as byte (only supporting slot 2 for now)
-            command[UID_BYTE_LENGTH + 4] = 0x02
-            // copy the challenge
-            challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
-            // connect and send command
-            Log.i("Command", Hex.encodeHexString(command))
-            val response = nfcV.transceive(command)
-            nfcV.close()
-            Log.i("Response", Hex.encodeHexString(response))
-
-            val sessionRequest = SessionRequest(
-                uid = Hex.encodeHexString(tag.id!!.reversedArray()),
-                response = Hex.encodeHexString(response),
-                token = challengeResponse.token
-            )
-
-            val sessionResponse = async {
-                authApiService.postSession(sessionRequest)
-            }.await()
-
-            if (!sessionResponse.isSuccessful) {
-                OperationResult.Failure()
-            }
-
-            val result = sessionResponse.body()
-            result?.token?.let { jwt ->
-                println(jwt)
-                return@withContext OperationResult.Success(jwt)
-            }
-
-            OperationResult.Failure()
+        } catch (e: Exception) {
+            Log.i(this@NfcVControllerImpl::class.java.name, e.message.toString())
+            OperationResult.Failure(e)
         }
     }
 

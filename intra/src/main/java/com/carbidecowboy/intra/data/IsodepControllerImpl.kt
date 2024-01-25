@@ -129,7 +129,8 @@ class IsodepControllerImpl @Inject constructor(
                 val isoDep = IsoDep.get(tag)
                 isoDep.connect()
 
-                val ndefResult = isoDep.transceive(NDEF_SEL)
+                //TODO: Add error check on this result
+                isoDep.transceive(NDEF_SEL)
 
                 // send part 1 command
                 val part1Result = isoDep.transceive(command)
@@ -194,7 +195,7 @@ class IsodepControllerImpl @Inject constructor(
                 OperationResult.Failure()
             }
         } catch (e: Exception) {
-            Log.i("getVivokeyJwt", e.message.toString())
+            Log.i(this@IsodepControllerImpl::class.java.name, e.message.toString())
             OperationResult.Failure(e)
         }
     }

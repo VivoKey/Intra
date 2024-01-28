@@ -39,7 +39,7 @@ abstract class NfcModule {
     companion object {
         @Singleton
         @Provides
-        fun providesNfcAdapter(@ApplicationContext context: Context): NfcAdapter {
+        fun providesNfcAdapter(@ApplicationContext context: Context): NfcAdapter? {
             return NfcAdapter.getDefaultAdapter(context)
         }
 
@@ -51,7 +51,7 @@ abstract class NfcModule {
 
         @Provides
         @Singleton
-        fun provideNfcAdapterController(nfcAdapter: NfcAdapter): NfcAdapterController {
+        fun provideNfcAdapterController(nfcAdapter: NfcAdapter?): NfcAdapterController {
             return NfcAdapterController(nfcAdapter)
         }
     }

@@ -6,28 +6,34 @@ import android.nfc.Tag
 import android.os.Bundle
 import javax.inject.Inject
 
-class NfcAdapterController @Inject constructor(
-    private val nfcAdapter: NfcAdapter
+open class NfcAdapterController @Inject constructor(
+    private val nfcAdapter: NfcAdapter?
 ) {
     private var onTagDiscoveredListener: ((Tag?) -> Unit)? = null
     private val listenersStack = ArrayDeque<(Tag?) -> Unit>()
 
     fun enableNfc(activity: Activity) {
-        val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A
-        val options = Bundle()
+        nfcAdapter?.let { adapter ->
+            val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A
+            val options = Bundle()
 
-        nfcAdapter.enableReaderMode(
-            activity,
-            { tag ->
-                onTagDiscoveredListener?.invoke(tag)
-            },
-            flags,
-            options
-        )
+            adapter.enableReaderMode(
+                activity,
+                { tag ->
+                    onTagDiscoveredListener?.invoke(tag)
+                },
+                flags,
+                options
+            )
+        }
+    }
+
+    fun isNfcSupported(): Boolean {
+        return nfcAdapter != null
     }
 
     fun disableNfc(activity: Activity) {
-        nfcAdapter.disableReaderMode(activity)
+        nfcAdapter?.disableReaderMode(activity)
     }
 
     fun setOnTagDiscoveredListener(

@@ -20,6 +20,7 @@ interface NfcController {
     suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage>
     suspend fun withNdefConnection(tag: Tag, operations: suspend (ndef: Ndef) -> Unit): OperationResult<Unit> {
         return try {
+            close()
             val ndef = Ndef.get(tag)
             ndef.connect()
             operations(ndef)

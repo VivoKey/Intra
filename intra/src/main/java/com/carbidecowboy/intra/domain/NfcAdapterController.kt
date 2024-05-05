@@ -4,6 +4,7 @@ import android.app.Activity
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
+import android.util.Log
 import javax.inject.Inject
 
 open class NfcAdapterController @Inject constructor(
@@ -20,6 +21,7 @@ open class NfcAdapterController @Inject constructor(
             adapter.enableReaderMode(
                 activity,
                 { tag ->
+                    Log.d(this@NfcAdapterController::class.simpleName,"onTagDiscoveredListener: ${onTagDiscoveredListener.hashCode()}")
                     onTagDiscoveredListener?.invoke(tag)
                 },
                 flags,
@@ -41,15 +43,21 @@ open class NfcAdapterController @Inject constructor(
     ) {
         listenersStack.addLast(listener)
         updateListener()
+        Log.d(this@NfcAdapterController::class.simpleName, "Current listenerStack: ${listenersStack.forEach { it.hashCode() }}")
     }
 
     fun removeOnTagDiscoveredListener() {
         listenersStack.removeLast()
         updateListener()
+        Log.d(this@NfcAdapterController::class.simpleName, "Current listenerStack: ${listenersStack.forEach { it.hashCode() }}")
     }
 
     private fun updateListener() {
-        val currentListener = listenersStack.last()
+        val currentListener = if (listenersStack.isNotEmpty()) {
+            listenersStack.last()
+        } else {
+            null
+        }
         this.onTagDiscoveredListener = currentListener
     }
 }

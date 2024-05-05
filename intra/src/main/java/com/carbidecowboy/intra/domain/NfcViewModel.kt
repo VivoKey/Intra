@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import com.carbidecowboy.intra.di.NfcModule
 
 abstract class NfcViewModel(
-    setAsActiveOnInjection: Boolean = true,
     private val nfcAdapterController: NfcAdapterController,
-    private val nfcControllerFactory: NfcModule.NfcControllerFactory
+    private val nfcControllerFactory: NfcModule.NfcControllerFactory,
+    setAsActiveOnInjection: Boolean = true,
 ): ViewModel() {
 
     abstract fun onNfcTagDiscovered(tag: Tag, nfcController: NfcController)

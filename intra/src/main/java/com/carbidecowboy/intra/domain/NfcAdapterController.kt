@@ -46,13 +46,25 @@ open class NfcAdapterController @Inject constructor(
         }
         listenersStack.addLast(listener)
         updateListener()
-        Log.i(this@NfcAdapterController::class.simpleName, "Current listenerStack: ${listenersStack.forEach { it.hashCode() }}")
+        val log = buildString {
+            append("Current listenerState: ")
+            listenersStack.forEach {
+                append("${it.hashCode()}, ")
+            }
+        }
+        Log.i(this@NfcAdapterController::class.simpleName, log)
     }
 
     fun removeOnTagDiscoveredListener() {
         listenersStack.removeLast()
         updateListener()
-        Log.i(this@NfcAdapterController::class.simpleName, "Current listenerStack: ${listenersStack.forEach { it.hashCode() }}")
+        val log = buildString {
+            append("Current listenerState: ")
+            listenersStack.forEach {
+                append("${it.hashCode()}, ")
+            }
+        }
+        Log.i(this@NfcAdapterController::class.simpleName, log)
     }
 
     private fun updateListener() {

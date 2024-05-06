@@ -21,7 +21,6 @@ open class NfcAdapterController @Inject constructor(
             adapter.enableReaderMode(
                 activity,
                 { tag ->
-                    Log.d(this@NfcAdapterController::class.simpleName,"onTagDiscoveredListener: ${onTagDiscoveredListener.hashCode()}")
                     onTagDiscoveredListener?.invoke(tag)
                 },
                 flags,
@@ -64,7 +63,7 @@ open class NfcAdapterController @Inject constructor(
         val log = buildString {
             append("Current listener queue: ")
             listenerMap.values.forEach {
-                append("Class: ${it.first}, HashCode: ${it.second.hashCode()}")
+                appendLine("Class: ${it.first}, HashCode: ${it.second.hashCode()}")
             }
         }
         Log.i(this@NfcAdapterController::class.simpleName, log)

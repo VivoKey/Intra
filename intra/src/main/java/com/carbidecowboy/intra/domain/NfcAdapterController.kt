@@ -11,7 +11,7 @@ open class NfcAdapterController @Inject constructor(
     private val nfcAdapter: NfcAdapter?
 ) {
     private var onTagDiscoveredListener: ((Tag?) -> Unit)? = null
-    private val listenersStack = ArrayDeque<(Tag?) -> Unit>()
+    private val listenerMap = LinkedHashMap<String, Pair<String, (Tag?) -> Unit>>()
 
     fun enableNfc(activity: Activity) {
         nfcAdapter?.let { adapter ->
@@ -39,40 +39,34 @@ open class NfcAdapterController @Inject constructor(
     }
 
     fun setOnTagDiscoveredListener(
+        uuid: String,
+        className: String,
         listener: (Tag?) -> Unit
     ) {
-        if (listenersStack.contains(listener)) {
-            listenersStack.remove(listener)
-        }
-        listenersStack.addLast(listener)
+        listenerMap.remove(uuid)
+        listenerMap[uuid] = className to listener
         updateListener()
-        val log = buildString {
-            append("Current listenerState: ")
-            listenersStack.forEach {
-                append("${it.hashCode()}, ")
-            }
-        }
-        Log.i(this@NfcAdapterController::class.simpleName, log)
+        logCurrentListeners()
     }
 
-    fun removeOnTagDiscoveredListener() {
-        listenersStack.removeLast()
+    fun removeOnTagDiscoveredListener(uuid: String) {
+        listenerMap.remove(uuid)
         updateListener()
-        val log = buildString {
-            append("Current listenerState: ")
-            listenersStack.forEach {
-                append("${it.hashCode()}, ")
-            }
-        }
-        Log.i(this@NfcAdapterController::class.simpleName, log)
+        logCurrentListeners()
     }
 
     private fun updateListener() {
-        val currentListener = if (listenersStack.isNotEmpty()) {
-            listenersStack.last()
-        } else {
-            null
+        val lastEntry = listenerMap.values.lastOrNull()
+        onTagDiscoveredListener = lastEntry?.second
+    }
+
+    private fun logCurrentListeners() {
+        val log = buildString {
+            append("Current listener queue: ")
+            listenerMap.values.forEach {
+                append("Class: ${it.first}, HashCode: ${it.second.hashCode()}")
+            }
         }
-        this.onTagDiscoveredListener = currentListener
+        Log.i(this@NfcAdapterController::class.simpleName, log)
     }
 }

@@ -13,8 +13,8 @@ android {
         applicationId = "com.hoker.intra_example"
         minSdk = 28
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.0.14"
+        versionCode = 16
+        versionName = "1.0.16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

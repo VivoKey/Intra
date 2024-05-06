@@ -3,12 +3,16 @@ package com.carbidecowboy.intra.domain
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import com.carbidecowboy.intra.di.NfcModule
+import java.util.UUID
 
 abstract class NfcViewModel(
     private val nfcAdapterController: NfcAdapterController,
     private val nfcControllerFactory: NfcModule.NfcControllerFactory,
     setAsActiveOnInjection: Boolean = true,
 ): ViewModel() {
+
+    private val uuid = UUID.randomUUID().toString()
+    private val className = this::class.simpleName ?: "UnknownViewModel"
 
     abstract fun onNfcTagDiscovered(tag: Tag, nfcController: NfcController)
 
@@ -19,7 +23,7 @@ abstract class NfcViewModel(
     }
 
     fun setAsActiveListener() {
-        nfcAdapterController.setOnTagDiscoveredListener { tag ->
+        nfcAdapterController.setOnTagDiscoveredListener(uuid, className) { tag ->
             tag?.let {
                 val nfcControllerResult = nfcControllerFactory.getController(tag)
                 if (nfcControllerResult is OperationResult.Success) {
@@ -31,6 +35,6 @@ abstract class NfcViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        nfcAdapterController.removeOnTagDiscoveredListener()
+        nfcAdapterController.removeOnTagDiscoveredListener(uuid)
     }
 }

@@ -231,7 +231,7 @@ class IsodepControllerImpl @Inject constructor(
                             )
                         )
                     } else {
-                        return OperationResult.Failure()
+                        return OperationResult.Failure(Exception(response.statusCode.toString()))
                     }
                 }
                 put(response.data).limit(position()).rewind()

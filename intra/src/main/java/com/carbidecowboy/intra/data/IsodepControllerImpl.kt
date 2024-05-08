@@ -216,6 +216,7 @@ class IsodepControllerImpl @Inject constructor(
                 }
 
             val buffer = ByteBuffer.allocate(4096).apply {
+                Log.i(this@IsodepControllerImpl::class.simpleName, Hex.encodeHexString(apdu))
                 var response = splitApduResponse(isoDep!!.transceive(apdu))
                 while (response.statusCode != ApduUtils.APDU_OK) {
                     if ((response.statusCode shr 8).toByte() == ApduUtils.APDU_DATA_REMAINING.toByte()) {
@@ -231,7 +232,7 @@ class IsodepControllerImpl @Inject constructor(
                             )
                         )
                     } else {
-                        return OperationResult.Failure(Exception(response.statusCode.toString()))
+                        return OperationResult.Failure(Exception(response.statusCode.toString(16)))
                     }
                 }
                 put(response.data).limit(position()).rewind()

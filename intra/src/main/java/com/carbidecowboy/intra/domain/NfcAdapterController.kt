@@ -17,6 +17,7 @@ open class NfcAdapterController @Inject constructor(
         nfcAdapter?.let { adapter ->
             val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A
             val options = Bundle()
+            options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 1000)
 
             adapter.enableReaderMode(
                 activity,

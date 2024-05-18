@@ -13,10 +13,13 @@ android {
         applicationId = "com.hoker.intra_example"
         minSdk = 28
         targetSdk = 34
-        versionCode = 20
-        versionName = "1.1.2"
+        versionCode = 21
+        versionName = "1.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -35,26 +38,35 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
-    implementation("androidx.compose.ui:ui:1.5.4")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("androidx.compose.compiler:compiler:1.5.7")
-    implementation("com.google.dagger:hilt-android:2.48")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
-    ksp("com.google.dagger:hilt-compiler:2.48")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.compose.ui:ui:1.6.7")
+    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.compiler:compiler:1.5.14")
+    implementation("com.google.dagger:hilt-android:2.49")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+    ksp("com.google.dagger:hilt-compiler:2.49")
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13")
+
+    implementation(project(":intra"))
+    implementation("com.github.CarbideCowboy:Supra:0.0.4")
 }

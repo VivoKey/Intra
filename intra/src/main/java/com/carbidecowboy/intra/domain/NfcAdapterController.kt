@@ -15,7 +15,7 @@ open class NfcAdapterController @Inject constructor(
 
     fun enableNfc(activity: Activity) {
         nfcAdapter?.let { adapter ->
-            val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A
+            val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS
             val options = Bundle()
             options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 1000)
 

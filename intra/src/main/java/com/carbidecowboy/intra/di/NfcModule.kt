@@ -4,8 +4,10 @@ import android.content.Context
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
+import android.nfc.tech.NfcA
 import android.nfc.tech.NfcV
 import com.carbidecowboy.intra.data.IsodepControllerImpl
+import com.carbidecowboy.intra.data.NfcAControllerImpl
 import com.carbidecowboy.intra.data.NfcVControllerImpl
 import com.carbidecowboy.intra.domain.NfcAdapterController
 import com.carbidecowboy.intra.domain.NfcController
@@ -31,6 +33,10 @@ annotation class IsodepController
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class NfcVController
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NfcAController
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -66,9 +72,15 @@ abstract class NfcModule {
     @NfcVController
     abstract fun bindNfcVController(nfcVController: NfcVControllerImpl): NfcController
 
+    @Binds
+    @Singleton
+    @NfcAController
+    abstract fun bindNfcAController(nfcAController: NfcAControllerImpl): NfcController
+
     class NfcControllerFactory @Inject constructor(
         @IsodepController private val isodepControllerImpl: Provider<NfcController>,
-        @NfcVController private val nfcVControllerImpl: Provider<NfcController>
+        @NfcVController private val nfcVControllerImpl: Provider<NfcController>,
+        @NfcAController private val nfcAControllerImpl: Provider<NfcController>
     ) {
         fun getController(tag: Tag): OperationResult<NfcController> {
             return when (tag.techList.first()) {
@@ -77,6 +89,9 @@ abstract class NfcModule {
                 }
                 IsoDep::class.java.name -> {
                     OperationResult.Success(isodepControllerImpl.get())
+                }
+                NfcA::class.java.name -> {
+                    OperationResult.Success(nfcAControllerImpl.get())
                 }
                 else -> {
                     OperationResult.Failure()

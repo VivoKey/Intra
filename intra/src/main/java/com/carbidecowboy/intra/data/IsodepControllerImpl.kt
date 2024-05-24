@@ -10,9 +10,11 @@ import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.AuthApiService
 import com.carbidecowboy.intra.domain.NfcController
 import com.carbidecowboy.intra.domain.OperationResult
+import com.carbidecowboy.intra.domain.Timer
 import com.carbidecowboy.intra.domain.request.ChallengeRequest
 import com.carbidecowboy.intra.domain.request.SessionRequest
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +26,8 @@ import javax.inject.Inject
 import kotlin.experimental.xor
 
 class IsodepControllerImpl @Inject constructor(
-    @IntraAuthApiService private val authApiService: AuthApiService
+    @IntraAuthApiService private val authApiService: AuthApiService,
+    private val timer: Timer
 ) : NfcController {
 
     private val _connectionStatus = MutableStateFlow(false)
@@ -32,6 +35,7 @@ class IsodepControllerImpl @Inject constructor(
         get() = _connectionStatus.asStateFlow()
 
     private var isoDep: IsoDep? = null
+    private var timerJob: Job? = null
 
     companion object {
         private val NDEF_SEL: ByteArray = byteArrayOf(0x00.toByte(), 0xA4.toByte(), 0x04.toByte(), 0x0C.toByte(), 0x07.toByte(), 0xD2.toByte(), 0x76.toByte(), 0x00.toByte(), 0x00.toByte(), 0x85.toByte(), 0x01.toByte(), 0x01.toByte(), 0x00.toByte())
@@ -45,6 +49,7 @@ class IsodepControllerImpl @Inject constructor(
             isoDep?.let {
                 it.connect()
                 _connectionStatus.emit(true)
+                startConnectionCheckJob()
                 OperationResult.Success(Unit)
             }
             OperationResult.Failure(Exception("IsoDep.connect() came back as null"))
@@ -56,6 +61,7 @@ class IsodepControllerImpl @Inject constructor(
     override suspend fun close() {
         isoDep?.close()
         isoDep = null
+        stopConnectionCheckJob()
         _connectionStatus.emit(false)
     }
 
@@ -64,6 +70,7 @@ class IsodepControllerImpl @Inject constructor(
             val result = isoDep?.transceive(data) ?: return OperationResult.Failure(Exception("transceive(): IsoDep was null"))
             OperationResult.Success(result)
         } catch (e: Exception) {
+            close()
             OperationResult.Failure(e)
         }
     }
@@ -110,7 +117,6 @@ class IsodepControllerImpl @Inject constructor(
     override suspend fun getVivokeyJwt(
         tag: Tag,
     ): OperationResult<String> {
-
         return try {
             withContext(Dispatchers.IO) {
 
@@ -279,5 +285,34 @@ class IsodepControllerImpl @Inject constructor(
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }
+    }
+
+    override suspend fun checkConnection(): OperationResult<Boolean> {
+        return try {
+            OperationResult.Success(isoDep?.isConnected ?: false)
+        } catch (e: Exception) {
+            OperationResult.Failure(e)
+        }
+    }
+
+    private suspend fun startConnectionCheckJob() {
+        timerJob?.cancel()
+        timerJob = timer.repeatEverySecond {
+            Log.i("ConnectionCheck", "ISODEP CONNECTION CHECK")
+            when (val isConnected = checkConnection()) {
+                is OperationResult.Success -> {
+                    if (!isConnected.data) {
+                        close()
+                    }
+                }
+                is OperationResult.Failure -> {
+                    close()
+                }
+            }
+        }
+    }
+
+    private fun stopConnectionCheckJob() {
+        timerJob?.cancel()
     }
 }

@@ -8,6 +8,8 @@ import android.util.Log
 import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.NfcController
 import com.carbidecowboy.intra.domain.OperationResult
+import com.carbidecowboy.intra.domain.Timer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,13 +17,16 @@ import java.nio.ByteBuffer
 import javax.inject.Inject
 import kotlin.experimental.xor
 
-class NfcAControllerImpl @Inject constructor(): NfcController {
+class NfcAControllerImpl @Inject constructor(
+    private val timer: Timer
+): NfcController {
 
     private val _connectionStatus = MutableStateFlow(false)
     override val connectionStatus: StateFlow<Boolean>
         get() = _connectionStatus.asStateFlow()
 
     private var nfcA: NfcA? = null
+    private var timerJob: Job? = null
 
     override suspend fun connect(tag: Tag): OperationResult<Unit> {
         return try {
@@ -29,6 +34,7 @@ class NfcAControllerImpl @Inject constructor(): NfcController {
             nfcA = NfcA.get(tag)
             nfcA?.connect()
             Log.i("ApexConnection", "----NFC_A CONNECTED")
+            startConnectionCheckJob()
             _connectionStatus.emit(true)
             OperationResult.Success(Unit)
         } catch (e: Exception) {
@@ -39,6 +45,7 @@ class NfcAControllerImpl @Inject constructor(): NfcController {
     override suspend fun close() {
         nfcA?.let {
             it.close()
+            stopConnectionCheckJob()
             nfcA = null
             Log.i("ApexConnection", "----NFC_A CLOSED")
             _connectionStatus.emit(false)
@@ -208,6 +215,35 @@ class NfcAControllerImpl @Inject constructor(): NfcController {
         return try {
             val result = ndef.cachedNdefMessage
             OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Failure(e)
+        }
+    }
+
+    private suspend fun startConnectionCheckJob() {
+        timerJob?.cancel()
+        timerJob = timer.repeatEverySecond {
+            Log.i("ConnectionCheck", "CONNECTION CHECK")
+            when (val isConnected = checkConnection()) {
+                is OperationResult.Success -> {
+                    if (!isConnected.data) {
+                        close()
+                    }
+                }
+                is OperationResult.Failure -> {
+                    close()
+                }
+            }
+        }
+    }
+
+    private fun stopConnectionCheckJob() {
+        timerJob?.cancel()
+    }
+
+    override suspend fun checkConnection(): OperationResult<Boolean> {
+        return try {
+            OperationResult.Success(nfcA?.isConnected ?: false)
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }

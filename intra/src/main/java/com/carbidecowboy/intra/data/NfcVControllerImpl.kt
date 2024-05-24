@@ -10,9 +10,11 @@ import com.carbidecowboy.intra.domain.ApduUtils
 import com.carbidecowboy.intra.domain.AuthApiService
 import com.carbidecowboy.intra.domain.NfcController
 import com.carbidecowboy.intra.domain.OperationResult
+import com.carbidecowboy.intra.domain.Timer
 import com.carbidecowboy.intra.domain.request.ChallengeRequest
 import com.carbidecowboy.intra.domain.request.SessionRequest
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +25,8 @@ import java.nio.ByteBuffer
 import javax.inject.Inject
 
 class NfcVControllerImpl @Inject constructor(
-    @IntraAuthApiService private val authApiService: AuthApiService
+    @IntraAuthApiService private val authApiService: AuthApiService,
+    private val timer: Timer
 ): NfcController {
 
     companion object {
@@ -35,12 +38,14 @@ class NfcVControllerImpl @Inject constructor(
         get() = _connectionStatus.asStateFlow()
 
     private var nfcV: NfcV? = null
+    private var timerJob: Job? = null
 
     override suspend fun connect(tag: Tag): OperationResult<Unit> {
         return try {
             close()
             nfcV = NfcV.get(tag)
             nfcV?.connect()
+            startConnectionCheckJob()
             _connectionStatus.emit(true)
             OperationResult.Success(Unit)
         } catch (e: Exception) {
@@ -51,6 +56,7 @@ class NfcVControllerImpl @Inject constructor(
     override suspend fun close() {
         nfcV?.let {
             it.close()
+            stopConnectionCheckJob()
             nfcV = null
             _connectionStatus.emit(false)
         }
@@ -224,6 +230,35 @@ class NfcVControllerImpl @Inject constructor(
         return try {
             val result = ndef.cachedNdefMessage
             OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Failure(e)
+        }
+    }
+
+    private suspend fun startConnectionCheckJob() {
+        timerJob?.cancel()
+        timerJob = timer.repeatEverySecond {
+            Log.i("ConnectionCheck", "CONNECTION CHECK")
+            when (val isConnected = checkConnection()) {
+                is OperationResult.Success -> {
+                    if (!isConnected.data) {
+                        close()
+                    }
+                }
+                is OperationResult.Failure -> {
+                    close()
+                }
+            }
+        }
+    }
+
+    private fun stopConnectionCheckJob() {
+        timerJob?.cancel()
+    }
+
+    override suspend fun checkConnection(): OperationResult<Boolean> {
+        return try {
+            OperationResult.Success(nfcV?.isConnected ?: false)
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }

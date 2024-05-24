@@ -13,8 +13,8 @@ android {
         applicationId = "com.hoker.intra_example"
         minSdk = 28
         targetSdk = 34
-        versionCode = 22
-        versionName = "1.1.4"
+        versionCode = 23
+        versionName = "1.1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -68,5 +68,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13")
 
     implementation(project(":intra"))
-    implementation("com.github.CarbideCowboy:Supra:0.0.4")
+    implementation("com.github.CarbideCowboy:Supra:0.0.5")
 }

@@ -59,7 +59,11 @@ class IsodepControllerImpl @Inject constructor(
     }
 
     override suspend fun close() {
-        isoDep?.close()
+        try {
+            isoDep?.close()
+        } catch(e: Exception) {
+            Log.d(this::class.java.simpleName, "Tag was out of date")
+        }
         isoDep = null
         stopConnectionCheckJob()
         _connectionStatus.emit(false)

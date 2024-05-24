@@ -54,12 +54,14 @@ class NfcVControllerImpl @Inject constructor(
     }
 
     override suspend fun close() {
-        nfcV?.let {
-            it.close()
-            stopConnectionCheckJob()
-            nfcV = null
-            _connectionStatus.emit(false)
+        try {
+            nfcV?.close()
+        } catch(e: Exception) {
+            Log.d(this::class.java.simpleName, "Tag was out of date")
         }
+        stopConnectionCheckJob()
+        nfcV = null
+        _connectionStatus.emit(false)
     }
 
     override suspend fun getAts(): OperationResult<ByteArray?> {

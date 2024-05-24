@@ -43,13 +43,15 @@ class NfcAControllerImpl @Inject constructor(
     }
 
     override suspend fun close() {
-        nfcA?.let {
-            it.close()
-            stopConnectionCheckJob()
-            nfcA = null
-            Log.i("ApexConnection", "----NFC_A CLOSED")
-            _connectionStatus.emit(false)
+        try {
+            nfcA?.close()
+        } catch(e: Exception) {
+            Log.d(this::class.java.simpleName, "Tag was out of date")
         }
+        stopConnectionCheckJob()
+        nfcA = null
+        Log.i("ApexConnection", "----NFC_A CLOSED")
+        _connectionStatus.emit(false)
     }
 
     override suspend fun getAtr(): OperationResult<ByteArray?> {

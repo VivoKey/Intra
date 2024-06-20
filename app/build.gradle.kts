@@ -68,5 +68,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13")
 
     implementation(project(":intra"))
-    implementation("com.github.CarbideCowboy:Supra:0.0.5")
+    implementation("com.github.CarbideCowboy:Supra:0.0.6")
 }

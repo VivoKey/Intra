@@ -71,7 +71,9 @@ class IsodepControllerImpl @Inject constructor(
 
     override suspend fun transceive(data: ByteArray): OperationResult<ByteArray> {
         return try {
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive data: ${Hex.encodeHexString(data)}")
             val result = isoDep?.transceive(data) ?: return OperationResult.Failure(Exception("transceive(): IsoDep was null"))
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive result: ${Hex.encodeHexString(result)}")
             OperationResult.Success(result)
         } catch (e: Exception) {
             close()
@@ -226,7 +228,7 @@ class IsodepControllerImpl @Inject constructor(
                 }
 
             val buffer = ByteBuffer.allocate(4096).apply {
-                Log.i(this@IsodepControllerImpl::class.simpleName, Hex.encodeHexString(apdu))
+                Log.i("${this@IsodepControllerImpl::class.simpleName}", "APDU request: ${Hex.encodeHexString(apdu)}")
                 var response = splitApduResponse(isoDep!!.transceive(apdu))
                 while (response.statusCode != ApduUtils.APDU_OK) {
                     if ((response.statusCode shr 8).toByte() == ApduUtils.APDU_DATA_REMAINING.toByte()) {
@@ -247,6 +249,7 @@ class IsodepControllerImpl @Inject constructor(
                 }
                 put(response.data).limit(position()).rewind()
             }
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ${Hex.encodeHexString(buffer)}")
             return OperationResult.Success(buffer)
         } catch(e: Exception) {
             close()

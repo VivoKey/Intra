@@ -44,10 +44,13 @@ class NfcVControllerImpl @Inject constructor(
         return try {
             close()
             nfcV = NfcV.get(tag)
-            nfcV?.connect()
-            startConnectionCheckJob()
-            _connectionStatus.emit(true)
-            OperationResult.Success(Unit)
+            nfcV?.let {
+                it.connect()
+                startConnectionCheckJob()
+                _connectionStatus.emit(true)
+                OperationResult.Success(Unit)
+            }
+            OperationResult.Failure(Exception("NfcV.connect() came back as null"))
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }

@@ -32,11 +32,15 @@ class NfcAControllerImpl @Inject constructor(
         return try {
             close()
             nfcA = NfcA.get(tag)
-            nfcA?.connect()
-            Log.i("ApexConnection", "----NFC_A CONNECTED")
-            startConnectionCheckJob()
-            _connectionStatus.emit(true)
-            OperationResult.Success(Unit)
+            nfcA?.let {
+                it.connect()
+                it.timeout = 60000
+                Log.i("ApexConnection", "----NFC_A CONNECTED")
+                startConnectionCheckJob()
+                _connectionStatus.emit(true)
+                OperationResult.Success(Unit)
+            }
+            OperationResult.Failure(Exception("NfcA.connect() came back as null"))
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }

@@ -244,6 +244,7 @@ class IsodepControllerImpl @Inject constructor(
                             )
                         )
                     } else {
+                        Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ERROR!: ${Hex.encodeHexString(response.data)}")
                         return OperationResult.Failure(Exception(response.statusCode.toString(16)))
                     }
                 }
@@ -253,6 +254,7 @@ class IsodepControllerImpl @Inject constructor(
             return OperationResult.Success(buffer)
         } catch(e: Exception) {
             close()
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "EXCEPTION ISSUING APDU: ${e.message.toString()}")
             return OperationResult.Failure(e)
         }
     }

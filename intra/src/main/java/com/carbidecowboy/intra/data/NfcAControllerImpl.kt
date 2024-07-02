@@ -34,7 +34,7 @@ class NfcAControllerImpl @Inject constructor(
             nfcA = NfcA.get(tag)
             nfcA?.let {
                 it.connect()
-                it.timeout = 60000
+                it.timeout = 20000
                 Log.i("ApexConnection", "----NFC_A CONNECTED")
                 startConnectionCheckJob()
                 _connectionStatus.emit(true)

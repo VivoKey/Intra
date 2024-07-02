@@ -48,7 +48,7 @@ class IsodepControllerImpl @Inject constructor(
         return try {
             isoDep?.let {
                 it.connect()
-                it.timeout = 60000
+                it.timeout = 20000
                 _connectionStatus.emit(true)
                 startConnectionCheckJob()
                 OperationResult.Success(Unit)

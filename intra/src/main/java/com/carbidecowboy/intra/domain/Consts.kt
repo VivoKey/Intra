@@ -19,10 +19,7 @@ object Consts {
     const val MEMORY_FID = "99848A60"
     const val TESLA_FID = "E819C674"
     const val BIP32_FID = "38EA914A"
-    const val FIDO2_RESPONSE = "4649444F5F325F309000"
-    const val U2F_RESPONSE = "5532465F56329000"
-    const val FIDO2_URL = "https://getcybernetic.com/fido"
-    const val TESLA_URL = "https://getcybernetic.com/tesla"
+    const val FIDO2_RESPONSE = "5532465F56329000"
 
     //OTP
     const val SELECT_OTP = "00A404000DA0000005272101014150455801"

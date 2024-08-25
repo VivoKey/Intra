@@ -8,13 +8,13 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".IntraExampleApplication"
+        android:name="com.hoker.intra_example.IntraExampleApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Intra"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.IntraExampleActivity"
+            android:name="com.hoker.intra_example.presentation.IntraExampleActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"

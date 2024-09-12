@@ -5,6 +5,8 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 open class NfcAdapterController @Inject constructor(
@@ -12,6 +14,8 @@ open class NfcAdapterController @Inject constructor(
 ) {
     private var onTagDiscoveredListener: ((Tag?) -> Unit)? = null
     private val listenerMap = LinkedHashMap<String, Pair<String, (Tag?) -> Unit>>()
+    private val _connectionState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val connectionState = _connectionState.asStateFlow()
 
     fun enableNfc(activity: NfcActivity) {
         nfcAdapter?.let { adapter ->
@@ -22,9 +26,9 @@ open class NfcAdapterController @Inject constructor(
             adapter.enableReaderMode(
                 activity,
                 { tag ->
-                    activity.onScanStartedCallback?.invoke()
+                    _connectionState.value = true
                     onTagDiscoveredListener?.invoke(tag)
-                    activity.onScanEndedCallback?.invoke()
+                    _connectionState.value = false
                 },
                 flags,
                 options

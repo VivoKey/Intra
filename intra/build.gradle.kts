@@ -61,7 +61,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.CarbideCowboy"
                 artifactId = "Intra"
-                version = "1.2.7"
+                version = "1.2.8"
             }
         }
     }

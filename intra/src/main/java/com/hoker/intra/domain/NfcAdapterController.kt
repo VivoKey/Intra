@@ -27,8 +27,11 @@ open class NfcAdapterController @Inject constructor(
                 activity,
                 { tag ->
                     _connectionState.value = true
-                    onTagDiscoveredListener?.invoke(tag)
-                    _connectionState.value = false
+                    try {
+                        onTagDiscoveredListener?.invoke(tag)
+                    } finally {
+                        _connectionState.value = false
+                    }
                 },
                 flags,
                 options

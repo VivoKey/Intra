@@ -13,7 +13,7 @@ open class NfcAdapterController @Inject constructor(
     private var onTagDiscoveredListener: ((Tag?) -> Unit)? = null
     private val listenerMap = LinkedHashMap<String, Pair<String, (Tag?) -> Unit>>()
 
-    fun enableNfc(activity: Activity) {
+    fun enableNfc(activity: NfcActivity) {
         nfcAdapter?.let { adapter ->
             val flags = NfcAdapter.FLAG_READER_NFC_V or NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS
             val options = Bundle()
@@ -22,7 +22,9 @@ open class NfcAdapterController @Inject constructor(
             adapter.enableReaderMode(
                 activity,
                 { tag ->
+                    activity.onScanStartedCallback?.invoke()
                     onTagDiscoveredListener?.invoke(tag)
+                    activity.onScanEndedCallback?.invoke()
                 },
                 flags,
                 options

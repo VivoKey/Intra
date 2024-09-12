@@ -13,6 +13,9 @@ abstract class NfcActivity : ComponentActivity() {
 
     @Inject lateinit var nfcAdapterController: NfcAdapterController
 
+    val onScanStartedCallback: (() -> Unit)? = null
+    val onScanEndedCallback: (() -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         if (!nfcAdapterController.isNfcSupported()) {

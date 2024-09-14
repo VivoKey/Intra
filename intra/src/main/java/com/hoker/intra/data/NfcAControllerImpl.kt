@@ -217,7 +217,7 @@ class NfcAControllerImpl @Inject constructor(
         return OperationResult.Failure(Exception("This operation is not currently supported with NfcA"))
     }
 
-    override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage> {
+    override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?> {
         return try {
             val result = ndef.cachedNdefMessage
             OperationResult.Success(result)

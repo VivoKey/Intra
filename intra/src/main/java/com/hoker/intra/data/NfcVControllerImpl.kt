@@ -231,7 +231,7 @@ class NfcVControllerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage> {
+    override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?> {
         return try {
             val result = ndef.cachedNdefMessage
             OperationResult.Success(result)

@@ -45,7 +45,7 @@ classpath 'com.google.dagger:hilt-android-gradle-plugin:2.48'
 Finally, back in your module's `build.gradle`, add **Intra**'s import:
 
 ```
-implementation "com.github.carbidecowboy:intra:<intra_version>"
+implementation "com.github.h0ker:intra:<intra_version>"
 ```
 
 After a quick Gradle sync, you'll now be ready to use **Intra** in your Android application.

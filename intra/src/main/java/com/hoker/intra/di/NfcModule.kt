@@ -57,8 +57,11 @@ abstract class NfcModule {
 
         @Provides
         @Singleton
-        fun provideNfcAdapterController(nfcAdapter: NfcAdapter?): NfcAdapterController {
-            return NfcAdapterController(nfcAdapter)
+        fun provideNfcAdapterController(
+            nfcAdapter: NfcAdapter?,
+            nfcControllerFactory: NfcControllerFactory
+        ): NfcAdapterController {
+            return NfcAdapterController(nfcAdapter, nfcControllerFactory)
         }
     }
 

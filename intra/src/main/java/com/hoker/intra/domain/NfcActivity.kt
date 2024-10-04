@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import com.hoker.intra.di.NfcModule
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -12,6 +13,7 @@ import javax.inject.Inject
 abstract class NfcActivity : ComponentActivity() {
 
     @Inject lateinit var nfcAdapterController: NfcAdapterController
+    @Inject lateinit var nfcControllerFactory: NfcModule.NfcControllerFactory
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)

@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.carbidecowboy.intra_example"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.hoker.intra_example"
         minSdk = 28
         targetSdk = 35
-        versionCode = 131
-        versionName = "1.3.1"
+        versionCode = 133
+        versionName = "1.3.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -57,6 +57,7 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.ui:ui:1.6.7")
     implementation("androidx.compose.material:material:1.6.7")
@@ -68,5 +69,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13")
 
     implementation(project(":intra"))
-    implementation("com.github.CarbideCowboy:Supra:0.0.6")
+    implementation("com.github.h0ker:Supra:0.0.9")
 }

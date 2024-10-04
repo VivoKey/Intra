@@ -175,9 +175,6 @@ class NfcVControllerImpl @Inject constructor(
                     OperationResult.Failure()
                 }
 
-                val nfcV = NfcV.get(tag)
-                nfcV.connect()
-
                 // truncate challenge to 10 bytes
                 // challenge string into hex
                 val challengeBytes: ByteArray =
@@ -199,8 +196,7 @@ class NfcVControllerImpl @Inject constructor(
                 challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
                 // connect and send command
                 Log.i("Command", Hex.encodeHexString(command))
-                val response = nfcV.transceive(command)
-                nfcV.close()
+                val response = nfcV?.transceive(command)
                 Log.i("Response", Hex.encodeHexString(response))
 
                 val sessionRequest = SessionRequest(
@@ -229,6 +225,10 @@ class NfcVControllerImpl @Inject constructor(
             Log.i(this@NfcVControllerImpl::class.java.name, e.message.toString())
             OperationResult.Failure(e)
         }
+    }
+
+    override fun getMaxTransceiveLength(): Int? {
+        return nfcV?.maxTransceiveLength
     }
 
     override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?> {

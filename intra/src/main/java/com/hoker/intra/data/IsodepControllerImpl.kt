@@ -139,17 +139,14 @@ class IsodepControllerImpl @Inject constructor(
                 command[6] = 0x00.toByte()
                 command[7] = 0x00.toByte()
 
-                val isoDep = IsoDep.get(tag)
-                isoDep.connect()
-
                 //TODO: Add error check on this result
-                isoDep.transceive(NDEF_SEL)
+                isoDep?.transceive(NDEF_SEL)
 
                 // send part 1 command
-                val part1Result = isoDep.transceive(command)
+                val part1Result = isoDep?.transceive(command)
 
                 var piccChallenge = part1Result
-                piccChallenge = piccChallenge.copyOfRange(0, 16)
+                piccChallenge = piccChallenge?.copyOfRange(0, 16)
                 println("PICC Challenge:\n${Hex.encodeHexString(piccChallenge)}\n\n")
 
                 val challengeRequest = ChallengeRequest(
@@ -179,8 +176,7 @@ class IsodepControllerImpl @Inject constructor(
                 command[37] = 0x00.toByte()
 
                 Log.i("Part 2 Command", Hex.encodeHexString(command))
-                val response = isoDep.transceive(command)
-                isoDep.close()
+                val response = isoDep?.transceive(command)
                 Log.i("Response", Hex.encodeHexString(response))
 
                 val responseString = Hex.encodeHexString(response)
@@ -265,6 +261,10 @@ class IsodepControllerImpl @Inject constructor(
             resp.copyOfRange(0, resp.size - 2),
             ((0xff and resp[resp.size - 2].toInt()) shl 8) or (0xff and resp[resp.size - 1].toInt())
         )
+    }
+
+    override fun getMaxTransceiveLength(): Int? {
+        return isoDep?.maxTransceiveLength
     }
 
     override suspend fun writeNdefMessage(tag: Tag, message: NdefMessage): OperationResult<Unit> {

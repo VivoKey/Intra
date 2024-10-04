@@ -5,15 +5,17 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
+import com.hoker.intra.di.NfcModule
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 open class NfcAdapterController @Inject constructor(
-    private val nfcAdapter: NfcAdapter?
+    private val nfcAdapter: NfcAdapter?,
+    private val nfcControllerFactory: NfcModule.NfcControllerFactory
 ) {
-    private var onTagDiscoveredListener: ((Tag?) -> Unit)? = null
-    private val listenerMap = LinkedHashMap<String, Pair<String, (Tag?) -> Unit>>()
+    private var onTagDiscoveredListener: ((Tag, NfcController) -> Unit)? = null
+    private val listenerMap = LinkedHashMap<String, Pair<String, (Tag, NfcController) -> Unit>>()
     private val _onScanChannel = Channel<Unit>(Channel.BUFFERED)
     val scanEvent = _onScanChannel.receiveAsFlow()
 
@@ -26,8 +28,15 @@ open class NfcAdapterController @Inject constructor(
             adapter.enableReaderMode(
                 activity,
                 { tag ->
-                    _onScanChannel.trySend(Unit)
-                    onTagDiscoveredListener?.invoke(tag)
+                    when (val result = nfcControllerFactory.getController(tag)) {
+                        is OperationResult.Success -> {
+                            _onScanChannel.trySend(Unit)
+                            onTagDiscoveredListener?.invoke(tag, result.data)
+                        }
+                        is OperationResult.Failure -> {
+                            Log.i(this@NfcAdapterController::class.simpleName, "There was an error constructing the NfcController")
+                        }
+                    }
                 },
                 flags,
                 options
@@ -46,12 +55,19 @@ open class NfcAdapterController @Inject constructor(
     fun setOnTagDiscoveredListener(
         uuid: String,
         className: String,
-        listener: (Tag?) -> Unit
+        listener: (Tag, NfcController) -> Unit
     ) {
         listenerMap.remove(uuid)
         listenerMap[uuid] = className to listener
         updateListener()
         logCurrentListeners()
+    }
+
+    fun setOnTagDiscoveredListener(
+        listener: (Tag, NfcController) -> Unit
+    ) {
+        listenerMap.clear()
+        onTagDiscoveredListener = listener
     }
 
     fun removeOnTagDiscoveredListener(uuid: String) {

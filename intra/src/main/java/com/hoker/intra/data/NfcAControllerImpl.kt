@@ -204,6 +204,10 @@ class NfcAControllerImpl @Inject constructor(
         }
     }
 
+    override fun getMaxTransceiveLength(): Int? {
+        return nfcA?.maxTransceiveLength
+    }
+
     override suspend fun getNdefCapacity(ndef: Ndef): OperationResult<Int> {
         return try {
             val result = ndef.maxSize

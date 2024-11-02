@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.carbidecowboy.intra"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -61,7 +61,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.h0ker"
                 artifactId = "Intra"
-                version = "1.3.3"
+                version = "1.3.4"
             }
         }
     }

@@ -160,8 +160,6 @@ class IsodepControllerImpl @Inject constructor(
                             close()
                             connect(tag)
                             val ndefSelectResult = transceive(NDEF_SEL)
-                            val temp = Hex.encodeHexString((ndefSelectResult as OperationResult.Success).data)
-                            println(temp)
                             if (ndefSelectResult is OperationResult.Failure) {
                                 OperationResult.Failure(ndefSelectResult.exception)
                             }

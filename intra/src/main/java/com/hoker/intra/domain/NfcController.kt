@@ -4,6 +4,7 @@ import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import kotlinx.coroutines.flow.StateFlow
+import org.apache.commons.codec.binary.Hex
 import java.nio.ByteBuffer
 
 interface NfcController {
@@ -40,6 +41,41 @@ interface NfcController {
             close()
             OperationResult.Success(Unit)
         } catch (e: Exception) {
+            OperationResult.Failure(e)
+        }
+    }
+
+    suspend fun getVersion(): OperationResult<ByteArray> {
+        return try {
+            val getVersionCommand = byteArrayOf(0x60.toByte())
+            when (val response = transceive(getVersionCommand)) {
+                is OperationResult.Success -> {
+                    if (Hex.encodeHexString(response.data) == Consts.WRONG_LENGTH) {
+                        val getVersionApduResult = transceive(byteArrayOf(
+                            0x90.toByte(),
+                            0x60.toByte(),
+                            0x00.toByte(),
+                            0x00.toByte(),
+                            0x00.toByte()
+                        ))
+                        when (getVersionApduResult) {
+                            is OperationResult.Success -> {
+                                OperationResult.Success(getVersionApduResult.data)
+                            }
+
+                            is OperationResult.Failure -> {
+                                OperationResult.Failure(getVersionApduResult.exception)
+                            }
+                        }
+                    } else {
+                        OperationResult.Success(response.data)
+                    }
+                }
+                is OperationResult.Failure -> {
+                    OperationResult.Failure(response.exception)
+                }
+            }
+        } catch(e: Exception) {
             OperationResult.Failure(e)
         }
     }

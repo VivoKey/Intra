@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hoker.intra.domain.NfcActivity
+import com.hoker.intra_example.presentation.components.OperationTypeBottomBar
 import com.hoker.supra.presentation.scaffolds.SupraGyroScaffold
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -37,28 +39,44 @@ class IntraExampleActivity: NfcActivity() {
 
             SupraGyroScaffold(
                 borderColor = Color.DarkGray,
-                backgroundColor = Color.Black
+                backgroundColor = Color.Black,
+                bottomBar = {
+                    OperationTypeBottomBar(
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .fillMaxWidth(),
+                        onSelectOperationClicked = {
+                            viewModel.showOperationOptions = !viewModel.showOperationOptions
+                        },
+                        showOperationOptions = viewModel.showOperationOptions,
+                        onOperationTypeClicked = { operationType ->
+                            viewModel.output = null
+                            viewModel.selectedCommand = operationType
+                            viewModel.showOperationOptions = false
+                        }
+                    )
+                }
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    if (viewModel.jwtText == null) {
+                    if (viewModel.output == null) {
                         Text(
-                            text = "Scan to get JWT",
+                            text = "Selected Command: ${viewModel.selectedCommand.displayName}",
                             color = Color.White,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    viewModel.jwtText?.let { jwt ->
+                    viewModel.output?.let { output ->
                         Text(
-                            text = "JWT:",
+                            text = "${viewModel.selectedCommand.displayName}: ",
                             color = Color.White,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = jwt,
+                            text = output,
                             color = Color.White,
                             fontSize = 16.sp
                         )

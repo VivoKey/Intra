@@ -13,8 +13,8 @@ android {
         applicationId = "com.hoker.intra_example"
         minSdk = 28
         targetSdk = 35
-        versionCode = 134
-        versionName = "1.3.4"
+        versionCode = 135
+        versionName = "1.3.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
     ksp("com.google.dagger:hilt-compiler:2.49")
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13")
+    implementation("commons-codec:commons-codec:1.13")
 
     implementation(project(":intra"))
     implementation("com.github.h0ker:Supra:0.0.9")

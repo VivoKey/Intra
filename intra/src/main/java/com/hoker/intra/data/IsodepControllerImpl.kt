@@ -8,6 +8,7 @@ import android.util.Log
 import com.hoker.intra.di.IntraAuthApiService
 import com.hoker.intra.domain.ApduUtils
 import com.hoker.intra.domain.AuthApiService
+import com.hoker.intra.domain.Consts
 import com.hoker.intra.domain.NfcController
 import com.hoker.intra.domain.OperationResult
 import com.hoker.intra.domain.Timer
@@ -139,20 +140,57 @@ class IsodepControllerImpl @Inject constructor(
                 command[6] = 0x00.toByte()
                 command[7] = 0x00.toByte()
 
-                //TODO: Add error check on this result
-                isoDep?.transceive(NDEF_SEL)
+                var uid = Hex.encodeHexString(tag.id)
+
+                when (val getVersionResult = getVersion()) {
+                    is OperationResult.Success -> {
+                        if (Hex.encodeHexString(getVersionResult.data).uppercase() == Consts.CLASS_NOT_SUPPORTED) {
+                            val selectSparkResult = transceive(Hex.decodeHex(Consts.SELECT_CODE) + Hex.decodeHex(Consts.SPARK_AID).size.toByte() + Hex.decodeHex(Consts.SPARK_AID) + 0xFF.toByte())
+                            when (selectSparkResult) {
+                                is OperationResult.Success -> {
+                                    uid = Hex.encodeHexString(selectSparkResult.data).dropLast(4)
+                                }
+                                is OperationResult.Failure -> {
+                                    OperationResult.Failure(selectSparkResult.exception)
+                                }
+                            }
+                        } else {
+                            //Have to reset the connection because issuing the get version command
+                            // prior to selecting the NDEF AID yield strange behavior without a session reset for Spark 2 hardware
+                            close()
+                            connect(tag)
+                            val ndefSelectResult = transceive(NDEF_SEL)
+                            val temp = Hex.encodeHexString((ndefSelectResult as OperationResult.Success).data)
+                            println(temp)
+                            if (ndefSelectResult is OperationResult.Failure) {
+                                OperationResult.Failure(ndefSelectResult.exception)
+                            }
+                        }
+                    }
+                    is OperationResult.Failure -> {
+                        OperationResult.Failure(getVersionResult.exception)
+                    }
+                }
+
+                var piccChallenge: ByteArray? = null
 
                 // send part 1 command
-                val part1Result = isoDep?.transceive(command)
+                when (val part1Result = transceive(command)) {
+                    is OperationResult.Failure -> {
+                        OperationResult.Failure(part1Result.exception)
+                    }
+                    is OperationResult.Success -> {
+                        piccChallenge = part1Result.data
+                    }
+                }
 
-                var piccChallenge = part1Result
                 piccChallenge = piccChallenge?.copyOfRange(0, 16)
                 println("PICC Challenge:\n${Hex.encodeHexString(piccChallenge)}\n\n")
 
                 val challengeRequest = ChallengeRequest(
                     scheme = 2,
                     message = Hex.encodeHexString(piccChallenge),
-                    uid = Hex.encodeHexString(tag.id)
+                    uid = uid
                 )
 
                 val challengeResponse = async {
@@ -175,30 +213,38 @@ class IsodepControllerImpl @Inject constructor(
                 pcdChallengeBytes.copyInto(command, 5, 0)
                 command[37] = 0x00.toByte()
 
+                var responseString: String? = null
                 Log.i("Part 2 Command", Hex.encodeHexString(command))
-                val response = isoDep?.transceive(command)
-                Log.i("Response", Hex.encodeHexString(response))
-
-                val responseString = Hex.encodeHexString(response)
-
-                val sessionRequest = SessionRequest(
-                    uid = Hex.encodeHexString(tag.id),
-                    response = responseString,
-                    token = challengeResponse.token
-                )
-
-                val sessionResponse = async {
-                    authApiService.postSession(sessionRequest)
-                }.await()
-
-                if (!sessionResponse.isSuccessful) {
-                    OperationResult.Failure()
+                when (val response = transceive(command)) {
+                    is OperationResult.Failure -> {
+                        OperationResult.Failure(response.exception)
+                    }
+                    is OperationResult.Success -> {
+                        Log.i("Response", Hex.encodeHexString(response.data))
+                        responseString = Hex.encodeHexString(response.data)
+                    }
                 }
 
-                val result = sessionResponse.body()
-                result?.token?.let { jwt ->
-                    Log.i("JWT:", jwt)
-                    return@withContext OperationResult.Success(jwt)
+                responseString?.let {
+                    val sessionRequest = SessionRequest(
+                        uid = uid,
+                        response = responseString,
+                        token = challengeResponse.token
+                    )
+
+                    val sessionResponse = async {
+                        authApiService.postSession(sessionRequest)
+                    }.await()
+
+                    if (!sessionResponse.isSuccessful) {
+                        OperationResult.Failure()
+                    }
+
+                    val result = sessionResponse.body()
+                    result?.token?.let { jwt ->
+                        Log.i("JWT:", jwt)
+                        return@withContext OperationResult.Success(jwt)
+                    }
                 }
 
                 OperationResult.Failure()

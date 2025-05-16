@@ -16,7 +16,10 @@ interface NfcController {
     suspend fun issueApdu(instruction: Byte, p1: Byte = 0, p2: Byte = 0, data: ByteBuffer.() -> Unit = {}): OperationResult<ByteBuffer>
     suspend fun transceive(data: ByteArray): OperationResult<ByteArray>
     suspend fun writeNdefMessage(tag: Tag, message: NdefMessage): OperationResult<Unit>
-    suspend fun getVivokeyJwt(tag: Tag): OperationResult<String>
+    suspend fun getVivokeyJwt(
+        tag: Tag,
+        cid: String? = null
+    ): OperationResult<String>
     suspend fun getNdefCapacity(ndef: Ndef): OperationResult<Int>
     suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?>
     suspend fun checkConnection(): OperationResult<Boolean>

@@ -217,7 +217,10 @@ class NfcAControllerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getVivokeyJwt(tag: Tag): OperationResult<String> {
+    override suspend fun getVivokeyJwt(
+        tag: Tag,
+        cid: String?
+    ): OperationResult<String> {
         return OperationResult.Failure(Exception("This operation is not currently supported with NfcA"))
     }
 

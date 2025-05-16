@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Intra"
-        tools:targetApi="31">
+        tools:targetApi="35">
         <activity
             android:name="com.hoker.intra_example.presentation.IntraExampleActivity"
             android:exported="true"

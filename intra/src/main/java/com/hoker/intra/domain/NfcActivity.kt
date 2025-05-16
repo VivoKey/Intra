@@ -15,8 +15,8 @@ abstract class NfcActivity : ComponentActivity() {
     @Inject lateinit var nfcAdapterController: NfcAdapterController
     @Inject lateinit var nfcControllerFactory: NfcModule.NfcControllerFactory
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         if (!nfcAdapterController.isNfcSupported()) {
             Toast.makeText(this, "Your device does not support NFC which is required by this application.", Toast.LENGTH_LONG).show()
         }

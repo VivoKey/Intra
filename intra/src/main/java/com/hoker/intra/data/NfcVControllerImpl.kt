@@ -160,7 +160,10 @@ class NfcVControllerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getVivokeyJwt(tag: Tag): OperationResult<String> {
+    override suspend fun getVivokeyJwt(
+        tag: Tag,
+        cid: String?
+    ): OperationResult<String> {
         return try {
 
             withContext(Dispatchers.IO) {

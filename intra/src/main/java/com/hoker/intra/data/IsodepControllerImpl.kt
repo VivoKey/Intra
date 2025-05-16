@@ -124,6 +124,7 @@ class IsodepControllerImpl @Inject constructor(
 
     override suspend fun getVivokeyJwt(
         tag: Tag,
+        cid: String?
     ): OperationResult<String> {
         return try {
             withContext(Dispatchers.IO) {

@@ -124,7 +124,7 @@ class IsodepControllerImpl @Inject constructor(
 
     override suspend fun getVivokeyJwt(
         tag: Tag,
-        cid: String?
+        cld: String?
     ): OperationResult<String> {
         return try {
             withContext(Dispatchers.IO) {
@@ -228,7 +228,8 @@ class IsodepControllerImpl @Inject constructor(
                     val sessionRequest = SessionRequest(
                         uid = uid,
                         response = responseString,
-                        token = challengeResponse.token
+                        token = challengeResponse.token,
+                        cld = cld
                     )
 
                     val sessionResponse = async {

@@ -162,7 +162,7 @@ class NfcVControllerImpl @Inject constructor(
 
     override suspend fun getVivokeyJwt(
         tag: Tag,
-        cid: String?
+        cld: String?
     ): OperationResult<String> {
         return try {
 
@@ -205,7 +205,8 @@ class NfcVControllerImpl @Inject constructor(
                 val sessionRequest = SessionRequest(
                     uid = Hex.encodeHexString(tag.id!!.reversedArray()),
                     response = Hex.encodeHexString(response),
-                    token = challengeResponse.token
+                    token = challengeResponse.token,
+                    cld = cld
                 )
 
                 val sessionResponse = async {

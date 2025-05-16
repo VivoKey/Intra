@@ -61,7 +61,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.h0ker"
                 artifactId = "Intra"
-                version = "1.3.6"
+                version = "1.3.7"
             }
         }
     }

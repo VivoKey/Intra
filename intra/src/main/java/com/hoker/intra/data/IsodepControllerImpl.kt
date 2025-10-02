@@ -39,7 +39,21 @@ class IsodepControllerImpl @Inject constructor(
     private var timerJob: Job? = null
 
     companion object {
-        private val NDEF_SEL: ByteArray = byteArrayOf(0x00.toByte(), 0xA4.toByte(), 0x04.toByte(), 0x0C.toByte(), 0x07.toByte(), 0xD2.toByte(), 0x76.toByte(), 0x00.toByte(), 0x00.toByte(), 0x85.toByte(), 0x01.toByte(), 0x01.toByte(), 0x00.toByte())
+        private val NDEF_SEL: ByteArray = byteArrayOf(
+            0x00.toByte(),
+            0xA4.toByte(),
+            0x04.toByte(),
+            0x0C.toByte(),
+            0x07.toByte(),
+            0xD2.toByte(),
+            0x76.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x85.toByte(),
+            0x01.toByte(),
+            0x01.toByte(),
+            0x00.toByte()
+        )
         private val WRONG_RNDB: ByteArray = byteArrayOf(0x91.toByte(), 0xAE.toByte())
     }
 

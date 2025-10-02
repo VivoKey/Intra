@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.hoker.intra.domain.NfcActivity
 import com.hoker.intra_example.presentation.components.OperationTypeBottomBar
 import com.hoker.supra.presentation.scaffolds.SupraGyroScaffold
+import com.hoker.supra.presentation.scaffolds.SupraScaffold
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
@@ -37,9 +38,9 @@ class IntraExampleActivity: NfcActivity() {
                 }
             }
 
-            SupraGyroScaffold(
+            SupraScaffold(
                 borderColor = Color.DarkGray,
-                backgroundColor = Color.Black,
+                contentBackgroundColor = Color.Black,
                 bottomBar = {
                     OperationTypeBottomBar(
                         modifier = Modifier

@@ -31,6 +31,28 @@ class NfcVControllerImpl @Inject constructor(
 
     companion object {
         private const val UID_BYTE_LENGTH = 8
+        private val UNKNOWN_ISO_15693_ATR: ByteArray = byteArrayOf(
+            0x3B.toByte(),
+            0x8F.toByte(),
+            0x80.toByte(),
+            0x01.toByte(),
+            0x80.toByte(),
+            0x4F.toByte(),
+            0x0C.toByte(),
+            0xA0.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x03.toByte(),
+            0x06.toByte(),
+            0x0B.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x63.toByte()
+        )
     }
 
     private val _connectionStatus = MutableStateFlow(false)
@@ -72,7 +94,8 @@ class NfcVControllerImpl @Inject constructor(
     }
 
     override suspend fun getAtr(): OperationResult<ByteArray?> {
-        return OperationResult.Failure()
+        //TODO: This is temporary. I'd like to return after doing more research derive the ATR from the chip itself
+        return OperationResult.Success(UNKNOWN_ISO_15693_ATR)
     }
 
     override suspend fun issueApdu(

@@ -26,6 +26,7 @@ object Consts {
     const val APEX_ATR = "3B8A80010031C173C8400000900090"
     const val WRONG_LENGTH = "6700"
     const val CLASS_NOT_SUPPORTED = "6E00"
+    val FUNCTION_NOT_SUPPORTED = byteArrayOf(0x6A.toByte(), 0x81.toByte())
 
     //OTP
     const val SELECT_OTP = "00A404000DA0000005272101014150455801"

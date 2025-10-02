@@ -8,6 +8,7 @@ import android.util.Log
 import com.hoker.intra.di.IntraAuthApiService
 import com.hoker.intra.domain.ApduUtils
 import com.hoker.intra.domain.AuthApiService
+import com.hoker.intra.domain.Consts.FUNCTION_NOT_SUPPORTED
 import com.hoker.intra.domain.NfcController
 import com.hoker.intra.domain.OperationResult
 import com.hoker.intra.domain.Timer
@@ -90,7 +91,7 @@ class NfcVControllerImpl @Inject constructor(
     }
 
     override suspend fun getAts(): OperationResult<ByteArray?> {
-        return OperationResult.Failure()
+        return OperationResult.Success(FUNCTION_NOT_SUPPORTED)
     }
 
     override suspend fun getAtr(): OperationResult<ByteArray?> {

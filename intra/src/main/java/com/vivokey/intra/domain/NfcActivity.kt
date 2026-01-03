@@ -1,10 +1,10 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import com.hoker.intra.di.NfcModule
+import com.vivokey.intra.di.NfcModule
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import javax.inject.Inject

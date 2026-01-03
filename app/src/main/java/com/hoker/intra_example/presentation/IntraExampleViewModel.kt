@@ -4,10 +4,11 @@ import android.nfc.Tag
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.hoker.intra.domain.NfcAdapterController
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.NfcViewModel
-import com.hoker.intra.domain.OperationResult
+import com.vivokey.intra.domain.NfcAdapterController
+import com.vivokey.intra.domain.NfcController
+import com.vivokey.intra.domain.NfcViewModel
+import com.vivokey.intra.domain.OperationResult
+import com.hoker.intra_example.BuildConfig
 import com.hoker.intra_example.domain.models.OperationType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +46,7 @@ class IntraExampleViewModel @Inject constructor(
             nfcController.withConnection(tag) {
                 when (_selectedCommand.value) {
                     OperationType.JWT -> {
-                        when (val result = nfcController.getVivokeyJwt(tag)) {
+                        when (val result = nfcController.getVivokeyJwt(tag, BuildConfig.VIVOKEY_DEV_ID)) {
                             is OperationResult.Success -> {
                                 _output.value = result.data
                             }

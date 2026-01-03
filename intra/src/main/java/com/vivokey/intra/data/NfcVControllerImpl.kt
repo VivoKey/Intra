@@ -1,46 +1,79 @@
-package com.hoker.intra.data
+package com.vivokey.intra.data
 
 import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
-import android.nfc.tech.NfcA
+import android.nfc.tech.NfcV
 import android.util.Log
-import com.hoker.intra.domain.ApduUtils
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
-import com.hoker.intra.domain.Timer
+import com.vivokey.intra.di.IntraAuthApiService
+import com.vivokey.intra.domain.ApduUtils
+import com.vivokey.intra.domain.AuthApiService
+import com.vivokey.intra.domain.Consts.FUNCTION_NOT_SUPPORTED
+import com.vivokey.intra.domain.NfcController
+import com.vivokey.intra.domain.OperationResult
+import com.vivokey.intra.domain.Timer
+import com.vivokey.intra.domain.request.AuthenticateRequest
+import com.vivokey.intra.domain.request.ChallengeRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
+import org.apache.commons.codec.binary.Hex
 import java.nio.ByteBuffer
 import javax.inject.Inject
-import kotlin.experimental.xor
 
-class NfcAControllerImpl @Inject constructor(
+class NfcVControllerImpl @Inject constructor(
+    @IntraAuthApiService private val authApiService: AuthApiService,
     private val timer: Timer
 ): NfcController {
+
+    companion object {
+        private const val UID_BYTE_LENGTH = 8
+        private val UNKNOWN_ISO_15693_ATR: ByteArray = byteArrayOf(
+            0x3B.toByte(),
+            0x8F.toByte(),
+            0x80.toByte(),
+            0x01.toByte(),
+            0x80.toByte(),
+            0x4F.toByte(),
+            0x0C.toByte(),
+            0xA0.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x03.toByte(),
+            0x06.toByte(),
+            0x0B.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x63.toByte()
+        )
+    }
 
     private val _connectionStatus = MutableStateFlow(false)
     override val connectionStatus: StateFlow<Boolean>
         get() = _connectionStatus.asStateFlow()
 
-    private var nfcA: NfcA? = null
+    private var nfcV: NfcV? = null
     private var timerJob: Job? = null
 
     override suspend fun connect(tag: Tag): OperationResult<Unit> {
         return try {
             close()
-            nfcA = NfcA.get(tag)
-            nfcA?.let {
+            nfcV = NfcV.get(tag)
+            nfcV?.let {
                 it.connect()
-                it.timeout = 20000
-                Log.i("ApexConnection", "----NFC_A CONNECTED")
                 startConnectionCheckJob()
                 _connectionStatus.emit(true)
                 OperationResult.Success(Unit)
             }
-            OperationResult.Failure(Exception("NfcA.connect() came back as null"))
+            OperationResult.Failure(Exception("NfcV.connect() came back as null"))
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }
@@ -48,70 +81,22 @@ class NfcAControllerImpl @Inject constructor(
 
     override suspend fun close() {
         try {
-            nfcA?.close()
+            nfcV?.close()
         } catch(e: Exception) {
             Log.d(this::class.java.simpleName, "Tag was out of date")
         }
         stopConnectionCheckJob()
-        nfcA = null
-        Log.i("ApexConnection", "----NFC_A CLOSED")
+        nfcV = null
         _connectionStatus.emit(false)
     }
 
-    override suspend fun getAtr(): OperationResult<ByteArray?> {
-        nfcA?.let {
-            try {
-                val atr = mutableListOf<Byte>()
-                //Initial Header
-                atr.add(0x3b.toByte())
-                //T0
-                atr.add(0x8f.toByte())
-                //TD1
-                atr.add(0x80.toByte())
-                //TD2
-                atr.add(0x01.toByte())
-                //T1
-                atr.add(0x80.toByte())
-                //Application identifier presence indicator
-                atr.add(0x4f.toByte())
-                //length
-                atr.add(0x0c.toByte())
-                //RID
-                atr.addAll(
-                    byteArrayOf(
-                        0xa0.toByte(),
-                        0x00.toByte(),
-                        0x00.toByte(),
-                        0x03.toByte(),
-                        0x06.toByte()
-                    ).toList()
-                )
-                //Standard
-                atr.add(0x03.toByte())
-                //Card name
-                atr.addAll(byteArrayOf(0x00.toByte(), 0x00.toByte()).toList())
-                //RFU
-                atr.addAll(
-                    byteArrayOf(
-                        0x00.toByte(),
-                        0x00.toByte(),
-                        0x00.toByte(),
-                        0x00.toByte()
-                    ).toList()
-                )
-                //TCK
-                var tck = atr[1]
-                for (idx in 2 until atr.size) {
-                    tck = tck.xor(atr[idx])
-                }
-                atr.add(tck)
+    override suspend fun getAts(): OperationResult<ByteArray?> {
+        return OperationResult.Success(FUNCTION_NOT_SUPPORTED)
+    }
 
-                return OperationResult.Success(atr.toByteArray())
-            } catch(e: Exception) {
-                return OperationResult.Failure(e)
-            }
-        }
-        return OperationResult.Failure()
+    override suspend fun getAtr(): OperationResult<ByteArray?> {
+        //TODO: This is temporary. I'd like to return after doing more research derive the ATR from the chip itself
+        return OperationResult.Success(UNKNOWN_ISO_15693_ATR)
     }
 
     override suspend fun issueApdu(
@@ -135,12 +120,12 @@ class NfcAControllerImpl @Inject constructor(
                 }
 
             val buffer = ByteBuffer.allocate(4096).apply {
-                var response = splitApduResponse(nfcA!!.transceive(apdu))
+                var response = splitApduResponse(nfcV!!.transceive(apdu))
                 while (response.statusCode != ApduUtils.APDU_OK) {
                     if ((response.statusCode shr 8).toByte() == ApduUtils.APDU_DATA_REMAINING.toByte()) {
                         put(response.data)
                         response = splitApduResponse(
-                            nfcA!!.transceive(
+                            nfcV!!.transceive(
                                 byteArrayOf(
                                     0,
                                     ApduUtils.SEND_REMAINING_INS.toByte(),
@@ -169,23 +154,9 @@ class NfcAControllerImpl @Inject constructor(
         )
     }
 
-    override suspend fun getAts(): OperationResult<ByteArray?> {
-        nfcA?.let {
-            return try {
-                val uid = it.tag.id
-                val sak = it.sak
-                val sakByte = sak.toByte()
-                OperationResult.Success(uid + sakByte)
-            } catch(e: Exception) {
-                OperationResult.Failure(e)
-            }
-        }
-        return OperationResult.Failure()
-    }
-
     override suspend fun transceive(data: ByteArray): OperationResult<ByteArray> {
         return try {
-            OperationResult.Success(nfcA!!.transceive(data))
+            OperationResult.Success(nfcV!!.transceive(data))
         } catch(e: Exception) {
             close()
             OperationResult.Failure(e)
@@ -204,10 +175,6 @@ class NfcAControllerImpl @Inject constructor(
         }
     }
 
-    override fun getMaxTransceiveLength(): Int? {
-        return nfcA?.maxTransceiveLength
-    }
-
     override suspend fun getNdefCapacity(ndef: Ndef): OperationResult<Int> {
         return try {
             val result = ndef.maxSize
@@ -219,9 +186,80 @@ class NfcAControllerImpl @Inject constructor(
 
     override suspend fun getVivokeyJwt(
         tag: Tag,
+        devId: String,
         cld: String?
     ): OperationResult<String> {
-        return OperationResult.Failure(Exception("This operation is not currently supported with NfcA"))
+        return try {
+
+            withContext(Dispatchers.IO) {
+
+                // Get challenge from API (scheme 1 for NfcV/Spark 1)
+                val challengeRequest = ChallengeRequest(1)
+                val challengeResponse = async {
+                    authApiService.postChallenge(challengeRequest).body()
+                }.await()
+
+                if (challengeResponse == null) {
+                    OperationResult.Failure()
+                }
+
+                // truncate challenge to 10 bytes
+                // challenge string into hex
+                val challengeBytes: ByteArray =
+                    Hex.decodeHex(challengeResponse!!.payload.substring(0, 20))
+                val command = ByteArray(15 + UID_BYTE_LENGTH)
+                // Spark 1 flag mode (addressed command)
+                command[0] = 0x20
+                // authentication command code
+                command[1] = 0x35
+                // copy into command byte array
+                tag.id.copyInto(command, 2, 0)
+                // CSI (AES = 0x00)
+                command[UID_BYTE_LENGTH + 2] = 0x00
+                // RFU
+                command[UID_BYTE_LENGTH + 3] = 0x00
+                // Key slot as byte (only supporting slot 2 for now)
+                command[UID_BYTE_LENGTH + 4] = 0x02
+                // copy the challenge
+                challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
+                // connect and send command
+                Log.i("Command", Hex.encodeHexString(command))
+                val response = nfcV?.transceive(command)
+                Log.i("Response", Hex.encodeHexString(response))
+
+                // Use /authenticate endpoint with developer ID
+                // Returns encrypted JWE that must be sent to server for decryption
+                val authenticateRequest = AuthenticateRequest(
+                    uid = Hex.encodeHexString(tag.id!!.reversedArray()),
+                    response = Hex.encodeHexString(response),
+                    token = challengeResponse.token,
+                    dev_id = devId
+                )
+
+                val authenticateResponse = async {
+                    authApiService.postAuthenticate(authenticateRequest)
+                }.await()
+
+                if (!authenticateResponse.isSuccessful) {
+                    OperationResult.Failure()
+                }
+
+                val result = authenticateResponse.body()
+                result?.token?.let { jwe ->
+                    println(jwe)
+                    return@withContext OperationResult.Success(jwe)
+                }
+
+                OperationResult.Failure()
+            }
+        } catch (e: Exception) {
+            Log.i(this@NfcVControllerImpl::class.java.name, e.message.toString())
+            OperationResult.Failure(e)
+        }
+    }
+
+    override fun getMaxTransceiveLength(): Int? {
+        return nfcV?.maxTransceiveLength
     }
 
     override suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?> {
@@ -256,7 +294,7 @@ class NfcAControllerImpl @Inject constructor(
 
     override suspend fun checkConnection(): OperationResult<Boolean> {
         return try {
-            OperationResult.Success(nfcA?.isConnected ?: false)
+            OperationResult.Success(nfcV?.isConnected ?: false)
         } catch (e: Exception) {
             OperationResult.Failure(e)
         }

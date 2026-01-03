@@ -1,4 +1,4 @@
-package com.hoker.intra.di
+package com.vivokey.intra.di
 
 import android.content.Context
 import android.nfc.NfcAdapter
@@ -6,12 +6,12 @@ import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.nfc.tech.NfcA
 import android.nfc.tech.NfcV
-import com.hoker.intra.data.IsodepControllerImpl
-import com.hoker.intra.data.NfcAControllerImpl
-import com.hoker.intra.data.NfcVControllerImpl
-import com.hoker.intra.domain.NfcAdapterController
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
+import com.vivokey.intra.data.IsodepControllerImpl
+import com.vivokey.intra.data.NfcAControllerImpl
+import com.vivokey.intra.data.NfcVControllerImpl
+import com.vivokey.intra.domain.NfcAdapterController
+import com.vivokey.intra.domain.NfcController
+import com.vivokey.intra.domain.OperationResult
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

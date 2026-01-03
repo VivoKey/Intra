@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 object Consts {
     const val SUCCESS_RESPONSE = "9000"

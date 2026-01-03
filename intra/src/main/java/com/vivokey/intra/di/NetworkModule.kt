@@ -27,7 +27,7 @@ annotation class IntraAuthApiService
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val API_BASE_URL = "https://api.vivokey.com/"
+    private const val API_BASE_URL = "https://auth.vivokey.com/"
 
     @Provides
     @Singleton

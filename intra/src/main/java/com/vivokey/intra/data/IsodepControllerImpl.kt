@@ -66,7 +66,7 @@ class IsodepControllerImpl @Inject constructor(
                 it.timeout = 20000
                 _connectionStatus.emit(true)
                 startConnectionCheckJob()
-                OperationResult.Success(Unit)
+                return OperationResult.Success(Unit)
             }
             OperationResult.Failure(Exception("IsoDep.connect() came back as null"))
         } catch (e: Exception) {

@@ -38,7 +38,7 @@ class NfcAControllerImpl @Inject constructor(
                 Log.i("ApexConnection", "----NFC_A CONNECTED")
                 startConnectionCheckJob()
                 _connectionStatus.emit(true)
-                OperationResult.Success(Unit)
+                return OperationResult.Success(Unit)
             }
             OperationResult.Failure(Exception("NfcA.connect() came back as null"))
         } catch (e: Exception) {

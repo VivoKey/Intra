@@ -71,7 +71,7 @@ class NfcVControllerImpl @Inject constructor(
                 it.connect()
                 startConnectionCheckJob()
                 _connectionStatus.emit(true)
-                OperationResult.Success(Unit)
+                return OperationResult.Success(Unit)
             }
             OperationResult.Failure(Exception("NfcV.connect() came back as null"))
         } catch (e: Exception) {
@@ -225,12 +225,16 @@ class NfcVControllerImpl @Inject constructor(
                 // connect and send command
                 Log.i("Command", Hex.encodeHexString(command))
                 val response = nfcV?.transceive(command)
+                    ?: return@withContext OperationResult.Failure(Exception("NFC connection lost - please scan again"))
                 Log.i("Response", Hex.encodeHexString(response))
+
+                val tagId = tag.id
+                    ?: return@withContext OperationResult.Failure(Exception("Unable to read tag ID"))
 
                 // Use /authenticate endpoint with developer ID
                 // Returns encrypted JWE that must be sent to server for decryption
                 val authenticateRequest = AuthenticateRequest(
-                    uid = Hex.encodeHexString(tag.id!!.reversedArray()),
+                    uid = Hex.encodeHexString(tagId.reversedArray()),
                     response = Hex.encodeHexString(response),
                     token = challengeResponse.token,
                     dev_id = devId

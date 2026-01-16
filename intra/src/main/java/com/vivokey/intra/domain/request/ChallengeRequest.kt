@@ -1,4 +1,4 @@
-package com.hoker.intra.domain.request
+package com.vivokey.intra.domain.request
 
 data class ChallengeRequest(
     val scheme: Int,

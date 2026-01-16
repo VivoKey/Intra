@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel

@@ -1,19 +1,19 @@
-package com.hoker.intra.data
+package com.vivokey.intra.data
 
 import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.nfc.tech.Ndef
 import android.util.Log
-import com.hoker.intra.di.IntraAuthApiService
-import com.hoker.intra.domain.ApduUtils
-import com.hoker.intra.domain.AuthApiService
-import com.hoker.intra.domain.Consts
-import com.hoker.intra.domain.NfcController
-import com.hoker.intra.domain.OperationResult
-import com.hoker.intra.domain.Timer
-import com.hoker.intra.domain.request.ChallengeRequest
-import com.hoker.intra.domain.request.SessionRequest
+import com.vivokey.intra.di.IntraAuthApiService
+import com.vivokey.intra.domain.ApduUtils
+import com.vivokey.intra.domain.AuthApiService
+import com.vivokey.intra.domain.Consts
+import com.vivokey.intra.domain.NfcController
+import com.vivokey.intra.domain.OperationResult
+import com.vivokey.intra.domain.Timer
+import com.vivokey.intra.domain.request.AuthenticateRequest
+import com.vivokey.intra.domain.request.ChallengeRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -66,7 +66,7 @@ class IsodepControllerImpl @Inject constructor(
                 it.timeout = 20000
                 _connectionStatus.emit(true)
                 startConnectionCheckJob()
-                OperationResult.Success(Unit)
+                return OperationResult.Success(Unit)
             }
             OperationResult.Failure(Exception("IsoDep.connect() came back as null"))
         } catch (e: Exception) {
@@ -138,6 +138,7 @@ class IsodepControllerImpl @Inject constructor(
 
     override suspend fun getVivokeyJwt(
         tag: Tag,
+        devId: String,
         cld: String?
     ): OperationResult<String> {
         return try {
@@ -239,25 +240,27 @@ class IsodepControllerImpl @Inject constructor(
                 }
 
                 responseString?.let {
-                    val sessionRequest = SessionRequest(
-                        uid = uid,
-                        response = responseString,
+                    // Use /authenticate endpoint with developer ID
+                    // Returns encrypted JWE that must be sent to server for decryption
+                    val authenticateRequest = AuthenticateRequest(
                         token = challengeResponse.token,
-                        cld = cld
+                        response = responseString,
+                        uid = uid,
+                        dev_id = devId
                     )
 
-                    val sessionResponse = async {
-                        authApiService.postSession(sessionRequest)
+                    val authenticateResponse = async {
+                        authApiService.postAuthenticate(authenticateRequest)
                     }.await()
 
-                    if (!sessionResponse.isSuccessful) {
+                    if (!authenticateResponse.isSuccessful) {
                         OperationResult.Failure()
                     }
 
-                    val result = sessionResponse.body()
-                    result?.token?.let { jwt ->
-                        Log.i("JWT:", jwt)
-                        return@withContext OperationResult.Success(jwt)
+                    val result = authenticateResponse.body()
+                    result?.token?.let { jwe ->
+                        Log.i("JWE:", jwe)  // This is encrypted - cannot be decoded by mobile app
+                        return@withContext OperationResult.Success(jwe)
                     }
                 }
 

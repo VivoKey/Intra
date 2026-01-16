@@ -1,6 +1,6 @@
-package com.hoker.intra.di
+package com.vivokey.intra.di
 
-import com.hoker.intra.domain.AuthApiService
+import com.vivokey.intra.domain.AuthApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,22 +27,13 @@ annotation class IntraAuthApiService
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val AUTH_BASE_URL = "https://auth.vivokey.com/"
-    private const val API_HEADER = "X-API-VIVOKEY"
-    private const val API_KEY = "9e084e64-eb74-41b8-a87d-4c0bdcd1be64"
+    private const val API_BASE_URL = "https://auth.vivokey.com/"
 
     @Provides
     @Singleton
     @IntraOkHttp
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val originalRequest = chain.request()
-                val newRequest = originalRequest.newBuilder()
-                    .header(API_HEADER, API_KEY)
-                    .build()
-                chain.proceed(newRequest)
-            }
             .build()
     }
 
@@ -51,7 +42,7 @@ object NetworkModule {
     @IntraAuthRetrofit
     fun provideAuthRetrofit(@IntraOkHttp okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(AUTH_BASE_URL)
+            .baseUrl(API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

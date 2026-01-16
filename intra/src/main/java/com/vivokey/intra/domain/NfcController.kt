@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 import android.nfc.NdefMessage
 import android.nfc.Tag
@@ -16,9 +16,19 @@ interface NfcController {
     suspend fun issueApdu(instruction: Byte, p1: Byte = 0, p2: Byte = 0, data: ByteBuffer.() -> Unit = {}): OperationResult<ByteBuffer>
     suspend fun transceive(data: ByteArray): OperationResult<ByteArray>
     suspend fun writeNdefMessage(tag: Tag, message: NdefMessage): OperationResult<Unit>
+    /**
+     * Authenticates with VivoKey verify API and returns an encrypted JWE.
+     * The JWE must be sent to your server for decryption - mobile app cannot decrypt it.
+     *
+     * @param tag The NFC tag to authenticate
+     * @param devId The developer ID for the VivoKey verify API
+     * @param cld Optional custom client data to include in the JWT (max 2048 chars)
+     * @return Encrypted JWE token
+     */
     suspend fun getVivokeyJwt(
         tag: Tag,
-        cid: String? = null
+        devId: String,
+        cld: String? = null
     ): OperationResult<String>
     suspend fun getNdefCapacity(ndef: Ndef): OperationResult<Int>
     suspend fun getNdefMessage(ndef: Ndef): OperationResult<NdefMessage?>

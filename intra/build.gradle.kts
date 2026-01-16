@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.carbidecowboy.intra"
+    namespace = "com.vivokey.intra"
     compileSdk = 36
 
     defaultConfig {
@@ -59,9 +59,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.github.h0ker"
+                groupId = "com.github.vivokey"
                 artifactId = "Intra"
-                version = "1.3.9"
+                version = "2.0.0"
             }
         }
     }

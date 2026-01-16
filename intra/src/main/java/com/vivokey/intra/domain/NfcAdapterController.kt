@@ -1,11 +1,11 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 import android.app.Activity
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
-import com.hoker.intra.di.NfcModule
+import com.vivokey.intra.di.NfcModule
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject

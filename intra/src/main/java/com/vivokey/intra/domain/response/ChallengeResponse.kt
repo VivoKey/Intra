@@ -1,4 +1,4 @@
-package com.hoker.intra.domain.response
+package com.vivokey.intra.domain.response
 
 data class ChallengeResponse(
     val payload: String,

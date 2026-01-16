@@ -21,6 +21,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Developer ID for VivoKey verify API (example/test ID)
+        buildConfigField("String", "VIVOKEY_DEV_ID", "\"YOUR_DEVELOPER_ID_HERE\"")
     }
 
     buildTypes {
@@ -41,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"

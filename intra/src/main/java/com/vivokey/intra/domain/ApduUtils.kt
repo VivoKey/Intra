@@ -1,4 +1,4 @@
-package com.hoker.intra.domain
+package com.vivokey.intra.domain
 
 import java.io.IOException
 import java.nio.ByteBuffer

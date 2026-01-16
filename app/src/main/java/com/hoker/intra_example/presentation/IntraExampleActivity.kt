@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.hoker.intra.domain.NfcActivity
+import com.vivokey.intra.domain.NfcActivity
 import com.hoker.intra_example.presentation.components.OperationTypeBottomBar
 import com.hoker.supra.presentation.scaffolds.SupraGyroScaffold
 import com.hoker.supra.presentation.scaffolds.SupraScaffold

@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hoker.intra.domain.NfcActivity
 import com.hoker.intra_example.presentation.components.OperationTypeBottomBar
-import com.hoker.supra.presentation.scaffolds.SupraGyroScaffold
 import com.hoker.supra.presentation.scaffolds.SupraScaffold
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

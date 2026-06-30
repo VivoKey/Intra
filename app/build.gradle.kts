@@ -8,18 +8,24 @@ plugins {
 
 android {
     namespace = "com.hoker.intra_example"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.hoker.intra_example"
         minSdk = 31
-        targetSdk = 36
-        versionCode = 140
-        versionName = "1.4.0"
+        targetSdk = 37
+        versionCode = 150
+        versionName = "1.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) // Update to your target Java version
         }
     }
 
@@ -36,9 +42,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
     }
@@ -49,27 +52,24 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.core:core-ktx:1.19.0")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.14.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.ui:ui:1.9.2")
-    implementation("androidx.compose.material:material:1.9.2")
-    implementation("androidx.compose.compiler:compiler:1.5.15")
-    implementation("com.google.dagger:hilt-android:2.57.2")
-    implementation("androidx.activity:activity-compose:1.11.0")
+    implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("androidx.compose.ui:ui:1.11.3")
+    implementation("androidx.compose.material:material:1.11.3")
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    ksp("com.google.dagger:hilt-compiler:2.57.2")
+    ksp("com.google.dagger:hilt-compiler:2.60")
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.1")
-    implementation("commons-codec:commons-codec:1.13")
+    implementation("commons-codec:commons-codec:1.22.0")
 
     implementation(project(":intra"))
-    implementation("com.github.h0ker:Supra:0.1.23")
+    implementation("com.github.h0ker:Supra:0.2.11")
 }

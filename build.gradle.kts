@@ -1,15 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
-        classpath("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.2.20-2.0.2")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.59.2")
     }
 }
 
 plugins {
-    id("com.android.application") version "8.13.0" apply false
-    id("com.android.library") version "8.13.0" apply false
-    id("org.jetbrains.kotlin.android") version "2.2.20" apply false
-    id("com.google.devtools.ksp") version "2.2.20-2.0.2" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20" apply false
+    id("com.android.application") version "9.2.1" apply false
+    id("com.android.library") version "9.2.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.3.20" apply false
+    id("com.google.devtools.ksp") version "2.3.2" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.3.20" apply false
 }

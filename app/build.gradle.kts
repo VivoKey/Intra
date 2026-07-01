@@ -66,9 +66,9 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.59.2")
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    ksp("com.google.dagger:hilt-compiler:2.60")
+    ksp("com.google.dagger:hilt-compiler:2.59.2")
     implementation("androidx.constraintlayout:constraintlayout-compose-android:1.1.1")
-    implementation("commons-codec:commons-codec:1.22.0")
+    implementation("commons-codec:commons-codec:1.13")
 
     implementation(project(":intra"))
     implementation("com.github.h0ker:Supra:0.2.11")

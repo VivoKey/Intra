@@ -48,12 +48,12 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
     implementation("com.google.dagger:hilt-android:2.59.2")
-    ksp("com.google.dagger:hilt-compiler:2.60")
+    ksp("com.google.dagger:hilt-compiler:2.59.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("commons-codec:commons-codec:1.22.0")
+    implementation("commons-codec:commons-codec:1.13")
     implementation("com.squareup.okhttp3:okhttp:5.4.0")
 }
 

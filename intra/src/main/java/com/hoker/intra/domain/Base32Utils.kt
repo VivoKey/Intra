@@ -31,6 +31,37 @@ object Base32Utils {
     }
 
     /**
+     * Encodes a byte array into a Base32 string (uppercase, with padding).
+     */
+    fun encodeToString(data: ByteArray): String {
+        if (data.isEmpty()) return ""
+
+        val result = StringBuilder(data.size * 8 / 5 + 1)
+        var buffer = 0
+        var bitsLeft = 0
+
+        for (b in data) {
+            buffer = (buffer shl 8) or (b.toInt() and 0xFF)
+            bitsLeft += 8
+            while (bitsLeft >= 5) {
+                bitsLeft -= 5
+                result.append(ALPHABET[(buffer shr bitsLeft) and 0x1F])
+            }
+        }
+
+        if (bitsLeft > 0) {
+            result.append(ALPHABET[(buffer shl (5 - bitsLeft)) and 0x1F])
+        }
+
+        // Add padding to make length a multiple of 8
+        while (result.length % 8 != 0) {
+            result.append(PADDING)
+        }
+
+        return result.toString()
+    }
+
+    /**
      * Decodes a Base32-encoded string into a byte array.
      * Input is case-insensitive; padding characters are optional.
      *

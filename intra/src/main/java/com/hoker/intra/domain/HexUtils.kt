@@ -11,9 +11,10 @@ object HexUtils {
 
     /**
      * Encodes a byte array into a lowercase hex string.
-     * Equivalent to Hex.encodeHexString(byte[]).
+     * Returns an empty string if data is null.
      */
-    fun encodeHexString(data: ByteArray): String {
+    fun encodeHexString(data: ByteArray?): String {
+        if (data == null) return ""
         val result = CharArray(data.size * 2)
         for (i in data.indices) {
             val v = data[i].toInt() and 0xFF
@@ -25,9 +26,10 @@ object HexUtils {
 
     /**
      * Encodes a ByteBuffer (from position to limit) into a lowercase hex string.
-     * Equivalent to Hex.encodeHexString(ByteBuffer).
+     * Returns an empty string if buffer is null.
      */
-    fun encodeHexString(buffer: java.nio.ByteBuffer): String {
+    fun encodeHexString(buffer: java.nio.ByteBuffer?): String {
+        if (buffer == null) return ""
         val bytes = ByteArray(buffer.remaining())
         buffer.duplicate().get(bytes)
         return encodeHexString(bytes)

@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.apache.commons.codec.binary.Hex
+import com.hoker.intra.domain.HexUtils
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,7 +58,7 @@ class IntraExampleViewModel @Inject constructor(
                     OperationType.GET_VERSION -> {
                         when (val result = nfcController.getVersion()) {
                             is OperationResult.Success -> {
-                                _output.value = Hex.encodeHexString(result.data)
+                                _output.value = HexUtils.encodeHexString(result.data)
                             }
                             is OperationResult.Failure -> {
                                 _output.value = "ERROR:\n${result.exception?.message ?: "Unknown error"}"
@@ -69,7 +69,7 @@ class IntraExampleViewModel @Inject constructor(
                     OperationType.ATR -> {
                         when (val result = nfcController.getAtr()) {
                             is OperationResult.Success -> {
-                                _output.value = Hex.encodeHexString(result.data)
+                                _output.value = HexUtils.encodeHexString(result.data)
                             }
                             is OperationResult.Failure -> {
                                 _output.value = "ERROR:\n${result.exception?.message ?: "Unknown error"}"

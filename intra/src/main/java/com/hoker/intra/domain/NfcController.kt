@@ -4,7 +4,6 @@ import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import kotlinx.coroutines.flow.StateFlow
-import org.apache.commons.codec.binary.Hex
 import java.nio.ByteBuffer
 
 interface NfcController {
@@ -53,7 +52,7 @@ interface NfcController {
             val getVersionCommand = byteArrayOf(0x60.toByte())
             when (val response = transceive(getVersionCommand)) {
                 is OperationResult.Success -> {
-                    if (Hex.encodeHexString(response.data) == Consts.WRONG_LENGTH) {
+                    if (HexUtils.encodeHexString(response.data) == Consts.WRONG_LENGTH) {
                         val getVersionApduResult = transceive(byteArrayOf(
                             0x90.toByte(),
                             0x60.toByte(),

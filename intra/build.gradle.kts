@@ -53,7 +53,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("commons-codec:commons-codec:1.13")
     implementation("com.squareup.okhttp3:okhttp:5.4.0")
 }
 
@@ -64,7 +63,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.h0ker"
                 artifactId = "Intra"
-                version = "1.5.0"
+                version = "1.5.1"
             }
         }
     }

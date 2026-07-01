@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import org.apache.commons.codec.binary.Hex
+import com.hoker.intra.domain.HexUtils
 import java.nio.ByteBuffer
 import javax.inject.Inject
 
@@ -205,7 +205,7 @@ class NfcVControllerImpl @Inject constructor(
                 // truncate challenge to 10 bytes
                 // challenge string into hex
                 val challengeBytes: ByteArray =
-                    Hex.decodeHex(challengeResponse!!.payload.substring(0, 20))
+                    HexUtils.decodeHex(challengeResponse!!.payload.substring(0, 20))
                 val command = ByteArray(15 + UID_BYTE_LENGTH)
                 // Spark 1 flag mode (addressed command)
                 command[0] = 0x20
@@ -222,13 +222,13 @@ class NfcVControllerImpl @Inject constructor(
                 // copy the challenge
                 challengeBytes.copyInto(command, UID_BYTE_LENGTH + 5, 0)
                 // connect and send command
-                Log.i("Command", Hex.encodeHexString(command))
+                Log.i("Command", HexUtils.encodeHexString(command))
                 val response = nfcV?.transceive(command)
-                Log.i("Response", Hex.encodeHexString(response))
+                Log.i("Response", HexUtils.encodeHexString(response))
 
                 val sessionRequest = SessionRequest(
-                    uid = Hex.encodeHexString(tag.id!!.reversedArray()),
-                    response = Hex.encodeHexString(response),
+                    uid = HexUtils.encodeHexString(tag.id!!.reversedArray()),
+                    response = HexUtils.encodeHexString(response),
                     token = challengeResponse.token,
                     cld = cld
                 )

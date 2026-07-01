@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import org.apache.commons.codec.binary.Hex
+import com.hoker.intra.domain.HexUtils
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import kotlin.experimental.xor
@@ -87,9 +87,9 @@ class IsodepControllerImpl @Inject constructor(
 
     override suspend fun transceive(data: ByteArray): OperationResult<ByteArray> {
         return try {
-            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive data: ${Hex.encodeHexString(data)}")
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive data: ${HexUtils.encodeHexString(data)}")
             val result = isoDep?.transceive(data) ?: return OperationResult.Failure(Exception("transceive(): IsoDep was null"))
-            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive result: ${Hex.encodeHexString(result)}")
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.transceive", "Transceive result: ${HexUtils.encodeHexString(result)}")
             OperationResult.Success(result)
         } catch (e: Exception) {
             close()
@@ -126,7 +126,7 @@ class IsodepControllerImpl @Inject constructor(
                 }
                 atr[atr.size - 1] = tck
 
-                Log.i("ATR:", Hex.encodeHexString(atr))
+                Log.i("ATR:", HexUtils.encodeHexString(atr))
                 return OperationResult.Success(atr)
             } catch(e: Exception) {
                 close()
@@ -155,15 +155,15 @@ class IsodepControllerImpl @Inject constructor(
                 command[6] = 0x00.toByte()
                 command[7] = 0x00.toByte()
 
-                var uid = Hex.encodeHexString(tag.id)
+                var uid = HexUtils.encodeHexString(tag.id)
 
                 when (val getVersionResult = getVersion()) {
                     is OperationResult.Success -> {
-                        if (Hex.encodeHexString(getVersionResult.data).uppercase() == Consts.CLASS_NOT_SUPPORTED) {
-                            val selectSparkResult = transceive(Hex.decodeHex(Consts.SELECT_CODE) + Hex.decodeHex(Consts.SPARK_AID).size.toByte() + Hex.decodeHex(Consts.SPARK_AID) + 0xFF.toByte())
+                        if (HexUtils.encodeHexString(getVersionResult.data).uppercase() == Consts.CLASS_NOT_SUPPORTED) {
+                            val selectSparkResult = transceive(HexUtils.decodeHex(Consts.SELECT_CODE) + HexUtils.decodeHex(Consts.SPARK_AID).size.toByte() + HexUtils.decodeHex(Consts.SPARK_AID) + 0xFF.toByte())
                             when (selectSparkResult) {
                                 is OperationResult.Success -> {
-                                    uid = Hex.encodeHexString(selectSparkResult.data).dropLast(4)
+                                    uid = HexUtils.encodeHexString(selectSparkResult.data).dropLast(4)
                                 }
                                 is OperationResult.Failure -> {
                                     OperationResult.Failure(selectSparkResult.exception)
@@ -198,11 +198,11 @@ class IsodepControllerImpl @Inject constructor(
                 }
 
                 piccChallenge = piccChallenge?.copyOfRange(0, 16)
-                println("PICC Challenge:\n${Hex.encodeHexString(piccChallenge)}\n\n")
+                println("PICC Challenge:\n${HexUtils.encodeHexString(piccChallenge)}\n\n")
 
                 val challengeRequest = ChallengeRequest(
                     scheme = 2,
-                    message = Hex.encodeHexString(piccChallenge),
+                    message = HexUtils.encodeHexString(piccChallenge),
                     uid = uid
                 )
 
@@ -214,7 +214,7 @@ class IsodepControllerImpl @Inject constructor(
                     OperationResult.Failure()
                 }
 
-                val pcdChallengeBytes = Hex.decodeHex(challengeResponse!!.payload)
+                val pcdChallengeBytes = HexUtils.decodeHex(challengeResponse!!.payload)
 
                 // part 2 command
                 command = ByteArray(38)
@@ -227,14 +227,14 @@ class IsodepControllerImpl @Inject constructor(
                 command[37] = 0x00.toByte()
 
                 var responseString: String? = null
-                Log.i("Part 2 Command", Hex.encodeHexString(command))
+                Log.i("Part 2 Command", HexUtils.encodeHexString(command))
                 when (val response = transceive(command)) {
                     is OperationResult.Failure -> {
                         OperationResult.Failure(response.exception)
                     }
                     is OperationResult.Success -> {
-                        Log.i("Response", Hex.encodeHexString(response.data))
-                        responseString = Hex.encodeHexString(response.data)
+                        Log.i("Response", HexUtils.encodeHexString(response.data))
+                        responseString = HexUtils.encodeHexString(response.data)
                     }
                 }
 
@@ -285,7 +285,7 @@ class IsodepControllerImpl @Inject constructor(
                 }
 
             val buffer = ByteBuffer.allocate(4096).apply {
-                Log.i("${this@IsodepControllerImpl::class.simpleName}", "APDU request: ${Hex.encodeHexString(apdu)}")
+                Log.i("${this@IsodepControllerImpl::class.simpleName}", "APDU request: ${HexUtils.encodeHexString(apdu)}")
                 var response = splitApduResponse(isoDep!!.transceive(apdu))
                 while (response.statusCode != ApduUtils.APDU_OK) {
                     if ((response.statusCode shr 8).toByte() == ApduUtils.APDU_DATA_REMAINING.toByte()) {
@@ -301,13 +301,13 @@ class IsodepControllerImpl @Inject constructor(
                             )
                         )
                     } else {
-                        Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ERROR!: ${Hex.encodeHexString(response.data)}")
+                        Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ERROR!: ${HexUtils.encodeHexString(response.data)}")
                         return OperationResult.Failure(Exception(response.statusCode.toString(16)))
                     }
                 }
                 put(response.data).limit(position()).rewind()
             }
-            Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ${Hex.encodeHexString(buffer)}")
+            Log.i("${this@IsodepControllerImpl::class.simpleName}.issueApdu", "APDU response: ${HexUtils.encodeHexString(buffer)}")
             return OperationResult.Success(buffer)
         } catch(e: Exception) {
             close()
